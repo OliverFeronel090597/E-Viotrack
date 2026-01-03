@@ -1,0 +1,89 @@
+/* =========================
+   Root widget
+   ========================= */
+QWidget#ConfigMakerRoot {
+    background-color: #1a202c;
+}
+
+/* Ensure children inherit correctly */
+QWidget#ConfigMakerRoot QWidget {
+    background-color: transparent;
+}
+
+
+/* =========================
+   Buttons
+   ========================= */
+QPushButton#SelectFileButton,
+QPushButton#SaveConfigButton {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #4299e1, stop:1 #3182ce
+    );
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+QPushButton#SelectFileButton:hover,
+QPushButton#SaveConfigButton:hover {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #63b3ed, stop:1 #4299e1
+    );
+}
+
+QPushButton#SelectFileButton:pressed,
+QPushButton#SaveConfigButton:pressed {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3182ce, stop:1 #2c5282
+    );
+}
+
+/* Disabled Save button */
+QPushButton#SaveConfigButton:disabled {
+    background: #4a5568;
+    color: #a0aec0;
+}
+
+
+/* =========================
+   Text editor
+   ========================= */
+QTextEdit#ConfigTextEdit {
+    background-color: #1a202c;
+    color: #e2e8f0;
+
+    font-family: "Consolas", "Cascadia Code", "Segoe UI";
+    font-size: 11px;
+
+    border: 1px solid #4a5568;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+/* Focus */
+QTextEdit#ConfigTextEdit:focus {
+    border: 1px solid #4299e1;
+}
+
+/* Selection */
+QTextEdit#ConfigTextEdit::selection {
+    background-color: #4299e1;
+    color: #ffffff;
+}
+
+/* Disabled */
+QTextEdit#ConfigTextEdit:disabled {
+    background-color: #2d3748;
+    color: #a0aec0;
+}
+
+/* Placeholder (Qt 6) */
+QTextEdit#ConfigTextEdit[placeholderText] {
+    color: #718096;
+}
