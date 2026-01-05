@@ -202,6 +202,7 @@ QWidget#portContainer {
 
 QWidget#portRow {
     background-color: #f4f5f7;
+    border: 1px solid var(--border-light);
     border-radius: 4px;
     padding: 4px;
 }
@@ -209,17 +210,29 @@ QWidget#portRow {
 QCheckBox#portCheckBox {
     font-size: 14px;
     color: var(--text-main);
+    border: 1px solid var(--border-dark);
+    padding: 2px;
 }
 
+/* Baudrate combobox */
 QComboBox#baudRateCombo {
     font-size: 14px;
-    padding: 4px;
+    padding: 1px;
     border: 1px solid var(--border-light);
-    border-radius: 4px;
+    border-radius: none;
+    background-color: var(--bg-card);
+    color: var(--text-main);
 }
 
 QComboBox#baudRateCombo:focus {
     border: 1px solid #0078d7;
+}
+
+QComboBox#baudRateCombo QAbstractItemView {
+    background-color: var(--bg-card);
+    selection-background-color: var(--bg-accent);
+    selection-color: var(--text-invert);
+    color: var(--text-main);
 }
 
 QLabel#rfidReadLabel {
@@ -228,9 +241,97 @@ QLabel#rfidReadLabel {
     color: #333;
 }
 
-QListWidget#rfidTagList {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-light);
+/* ============================================================
+   QListWidget Scrollbar (rfidTagList)
+   ============================================================ */
+
+QListWidget#rfidTagList { 
+    background-color: var(--bg-light); 
+    border-radius: 6px; font-size: 13px;
+    color: var(--text-main);
+    border: 1px solid var(--border-dark);
+    }
+
+/* Vertical Scrollbar */
+QListWidget#rfidTagList QScrollBar:vertical {
+    width: 12px;
+    border: 1px solid var(--border-dark);
+    background: var(--bg-card);
+    margin: 0px 0px 0px 0px;
     border-radius: 6px;
-    font-size: 13px;
+}
+
+/* Horizontal Scrollbar */
+QListWidget#rfidTagList QScrollBar:horizontal {
+    height: 12px;
+    background: var(--bg-card);
+    margin: 0px 0px 0px 0px;
+    border-radius: 6px;
+}
+
+/* Scrollbar handle / slider */
+QListWidget#rfidTagList QScrollBar::handle:vertical,
+QListWidget#rfidTagList QScrollBar::handle:horizontal {
+    background-color: var(--bg-accent);
+    min-height: 20px;
+    min-width: 20px;
+    border-radius: 6px;
+}
+
+/* Hover effect on handle */
+QListWidget#rfidTagList QScrollBar::handle:vertical:hover,
+QListWidget#rfidTagList QScrollBar::handle:horizontal:hover {
+    background-color: #2980b9;
+}
+
+/* Pressed effect on handle */
+QListWidget#rfidTagList QScrollBar::handle:vertical:pressed,
+QListWidget#rfidTagList QScrollBar::handle:horizontal:pressed {
+    background-color: #3acdfa;
+}
+
+/* Scrollbar sub-page (space above/below handle) */
+QListWidget#rfidTagList QScrollBar::sub-page:vertical,
+QListWidget#rfidTagList QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
+
+/* Scrollbar add-page (space below/right of handle) */
+QListWidget#rfidTagList QScrollBar::add-page:vertical,
+QListWidget#rfidTagList QScrollBar::add-page:horizontal {
+    background: transparent;
+}
+
+/* Scrollbar arrows (optional, can hide) */
+QListWidget#rfidTagList QScrollBar::up-arrow,
+QListWidget#rfidTagList QScrollBar::down-arrow,
+QListWidget#rfidTagList QScrollBar::left-arrow,
+QListWidget#rfidTagList QScrollBar::right-arrow {
+    background: none;
+}
+
+QListWidget#rfidTagList QScrollBar::add-line,
+QListWidget#rfidTagList QScrollBar::sub-line {
+    background: none;
+    height: 0px;
+    width: 0px;
+}
+
+
+QLineEdit#maxLineEdit{
+    font-size: 14px;
+    background-color: var(--bg-card);
+    padding: 2px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--text-main);
+}
+
+QLabel#maxLineLabel{
+    font-size: 14px;
+    background-color: var(--bg-card);
+    padding: 2px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--text-main);
 }

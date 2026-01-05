@@ -147,7 +147,7 @@ class RFIDUI(QMainWindow):
         # WIDGETS
         self.home_page = HomePage(self.db)
         self.admin_page = AdminPage()
-        self.settings_page = RFIDManager(self.home_page)
+        self.settings_page = RFIDManager(self.home_page, self.db)
 
         # STACK
         self.stack = AnimatedStack(duration=self.anim_duration)

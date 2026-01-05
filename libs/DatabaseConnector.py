@@ -70,6 +70,10 @@ class DatabaseConnector:
             "id INTEGER PRIMARY KEY AUTOINCREMENT",
             "violation_type TEXT UNIQUE NOT NULL",
             "amount REAL NOT NULL"
+        ],
+        "comports": [
+            "port TEXT NOT NULL UNIQUE",
+            "baudrate TEXT NOT NULL"
         ]
     }
 
@@ -325,3 +329,57 @@ class DatabaseConnector:
         keys = ["driver_name", "driver_id", "rfid_serial",
                 "violation", "vehicle", "date", "due_date", "amount", "paid"]
         return [dict(zip(keys, row)) for row in rows]
+
+
+# =====================
+# COMPORT FUNCTIONS
+# =====================
+
+    def add_comport(self, port: str, baudrate: str) -> bool:
+        """
+        Insert a new COM port entry.
+        Returns True if successful, False on error (e.g., duplicate).
+        """
+        query = "INSERT OR REPLACE INTO comports (port, baudrate) VALUES (?, ?)"
+        result = self.execute_query(query, (port, baudrate))
+        return result is None
+
+    def update_comport(self, port: str, baudrate: str) -> bool:
+        """
+        Update baudrate of an existing COM port.
+        Returns True if successful, False if port does not exist.
+        """
+        query = "UPDATE comports SET baudrate=? WHERE port=?"
+        result = self.execute_query(query, (baudrate, port))
+        return result is None
+
+    def delete_comport(self, port: str) -> bool:
+        """
+        Remove a COM port entry.
+        Returns True if successful, False if port does not exist.
+        """
+        query = "DELETE FROM comports WHERE port=?"
+        result = self.execute_query(query, (port,))
+        return result is None
+
+    def get_comport(self, port: str) -> Union[Dict[str, str], None]:
+        """
+        Fetch a single COM port entry by port name.
+        Returns a dict with port and baudrate, or None if not found.
+        """
+        query = "SELECT port, baudrate FROM comports WHERE port=?"
+        row = self.execute_query(query, (port,), fetch_one=True)
+        if row:
+            return {"port": row[0], "baudrate": row[1]}
+        return None
+
+    def list_comports(self) -> List[Dict[str, str]]:
+        """
+        List all COM ports stored in database.
+        Returns a list of dicts.
+        """
+        query = "SELECT port, baudrate FROM comports ORDER BY port"
+        rows = self.execute_query(query, fetch_all=True)
+        if not rows:
+            return []
+        return [{"port": r[0], "baudrate": r[1]} for r in rows]
