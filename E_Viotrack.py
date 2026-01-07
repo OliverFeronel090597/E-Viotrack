@@ -19,7 +19,7 @@ from libs.DatabaseConnector import DatabaseConnector
 
 
 # -------------------- MAIN WINDOW --------------------
-class RFIDUI(QMainWindow):
+class E_Viotrack(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("E-Viotrack")
@@ -296,6 +296,6 @@ class RFIDUI(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationVersion("0.0.1")
-    window = RFIDUI()
+    window = E_Viotrack()
     window.show()
     sys.exit(app.exec())
