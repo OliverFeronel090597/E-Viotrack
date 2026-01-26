@@ -11,10 +11,13 @@ import sys
 # Absolute path to the folder containing this script,
 from libs.Animatedstack         import AnimatedStack
 from libs.stylesheetModefier    import StylesheetModifier
+
 from libs.Homepage              import HomePage
+from libs.LogPage import LogPage
 from libs.Settings              import RFIDManager
 from libs.Adminpage import AdminPage
 from libs.DatabaseConnector import DatabaseConnector
+from libs.Globalenentfilter import GlobalActivityLogger
 
 
 
@@ -22,9 +25,12 @@ from libs.DatabaseConnector import DatabaseConnector
 class E_Viotrack(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("E-Viotrack")
+        # self.setWindowTitle("E-Viotrack")
         self.setWindowIcon(QIcon("img/E-VioTrack.png"))
         self.setGeometry(100, 100, 800, 600)
+
+        # CREATE TASKBAR
+        self.create_taskbar()
 
         self.db = DatabaseConnector()
         self.db._create_tables_if_not_exist()
@@ -34,6 +40,8 @@ class E_Viotrack(QMainWindow):
         self.nav_width_expanded = 180
         self.nav_width_collapsed = 75
         self.anim_duration = 250
+        self.selected_nav_btn = None
+        
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
@@ -104,8 +112,11 @@ class E_Viotrack(QMainWindow):
         self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.toggle_btn.clicked.connect(self.toggle_nav)
         self.toggle_btn.setStyleSheet("""
-            QPushButton { background: transparent; border: none; }
-            QPushButton:hover { background-color: #3b3f45; }
+            QPushButton { 
+                background: transparent; 
+                border: none; }
+            QPushButton:hover { 
+                background-color: #3b3f45; }
         """)
 
         toggle_row.addWidget(self.toggle_btn)
@@ -146,13 +157,15 @@ class E_Viotrack(QMainWindow):
 
         # WIDGETS
         self.home_page = HomePage(self.db)
-        self.admin_page = AdminPage()
+        self.admin_page = AdminPage(self.db, self.login_type)
+        self.log_page = LogPage()
         self.settings_page = RFIDManager(self.home_page, self.db)
 
         # STACK
         self.stack = AnimatedStack(duration=self.anim_duration)
         self.stack.addWidget(self.home_page)
         self.stack.addWidget(self.admin_page)
+        self.stack.addWidget(self.log_page)
         self.stack.addWidget(self.settings_page)
 
         self.root_layout.addWidget(self.nav_widget)
@@ -161,9 +174,8 @@ class E_Viotrack(QMainWindow):
         # NAV CLICK HANDLERS
         self.btn_home.clicked.connect(lambda: self.stack.slide_to(0))
         self.btn_admin.clicked.connect(lambda: self.stack.slide_to(1))
-        self.btn_settings.clicked.connect(lambda: self.stack.slide_to(2))
-
-        self.create_taskbar()
+        self.btn_logs.clicked.connect(lambda: self.stack.slide_to(2))
+        self.btn_settings.clicked.connect(lambda: self.stack.slide_to(3))
 
     # -------------------- SEPARATOR --------------------
     def create_separator(self, direction="h"):
@@ -187,7 +199,9 @@ class E_Viotrack(QMainWindow):
         button.setObjectName("navbutton")
         button.setFixedHeight(60)
         button.setToolTip(text)
-        button.setStyleSheet("""
+
+        # base style for unselected buttons
+        default_style = """
             QPushButton {
                 color: white;
                 background-color: #079fce;
@@ -199,11 +213,19 @@ class E_Viotrack(QMainWindow):
                 background-color: #016583;
                 border: 1px solid #f53030;
             }
-            QPushButton::focus {
+        """
+        # selected style
+        selected_style = """
+            QPushButton {
+                color: white;
                 background-color: #016583;
                 border: 1px solid #f53030;
             }
-        """)
+        """
+
+        button.default_style = default_style
+        button.selected_style = selected_style
+        button.setStyleSheet(default_style)
 
         layout = QHBoxLayout(button)
         layout.setContentsMargins(10, 5, 10, 5)
@@ -213,10 +235,8 @@ class E_Viotrack(QMainWindow):
             pixmap.scaled(self.icon_size, Qt.AspectRatioMode.KeepAspectRatio,
                           Qt.TransformationMode.SmoothTransformation)
         )
-
         text_lbl = QLabel(text)
         text_lbl.setStyleSheet("color: white; font-size: 14px;")
-
         layout.addWidget(icon_lbl)
         layout.addWidget(text_lbl)
         layout.addStretch()
@@ -224,6 +244,17 @@ class E_Viotrack(QMainWindow):
         button.logo_label = icon_lbl
         button.text_label = text_lbl
 
+        # Connect click to selection handler
+        button.clicked.connect(lambda checked, b=button: self.select_nav_button(b))
+
+    def select_nav_button(self, button: QPushButton):
+        # reset previous
+        if self.selected_nav_btn and self.selected_nav_btn != button:
+            self.selected_nav_btn.setStyleSheet(self.selected_nav_btn.default_style)
+
+        # set new selected
+        button.setStyleSheet(button.selected_style)
+        self.selected_nav_btn = button
     # -------------------- FIXED NAV COLLAPSE --------------------
     def toggle_nav(self):
         start = self.nav_widget.width()
@@ -266,13 +297,14 @@ class E_Viotrack(QMainWindow):
         self.login_type.setObjectName("statusUser")  # QSS target
 
         # CENTER
-        self.center_label = QLabel("CENTER")
-        self.center_label.setObjectName("statusCenter")  # QSS target
-        self.center_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.connected_device = QLabel("Devices: 0")
+        self.connected_device.setObjectName("statusCenter")  # QSS target
+        self.connected_device.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # RIGHT: APP VERSION
         version = QApplication.instance().applicationVersion()
-        self.app_name_label = QLabel(f"V{version}")
+        app_name = QApplication.instance().applicationName()
+        self.app_name_label = QLabel(f"{app_name} {version}")
         self.app_name_label.setObjectName("statusVersion")  # QSS target
 
         # Spacers
@@ -285,7 +317,7 @@ class E_Viotrack(QMainWindow):
         # Add to status bar
         status.addWidget(self.login_type)      # LEFT
         status.addWidget(left_spacer)          # left spacer
-        status.addWidget(self.center_label)    # CENTER
+        status.addWidget(self.connected_device)    # CENTER
         status.addWidget(right_spacer)         # right spacer
         status.addPermanentWidget(self.app_name_label)  # RIGHT
 
@@ -296,6 +328,13 @@ class E_Viotrack(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationVersion("0.0.1")
+    app.setApplicationName("E-Viotrack")
+    event_filter = GlobalActivityLogger()
+    app.installEventFilter(event_filter)
     window = E_Viotrack()
     window.show()
+
+    logger = GlobalActivityLogger(log_callback=window.log_page.add_log, throttle_seconds=1)
+    app.installEventFilter(logger)
+
     sys.exit(app.exec())

@@ -4,7 +4,7 @@ import json
 import serial
 import serial.tools.list_ports
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout,
+    QWidget, QVBoxLayout,
     QLabel, QCheckBox, QListWidget
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer
@@ -172,9 +172,9 @@ class RFIDManager(QWidget):
         self.save_ports()
         event.accept()
 
-# -------------------- Run --------------------
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = RFIDManager()
-    win.show()
-    sys.exit(app.exec())
+# # -------------------- Run --------------------
+# if __name__ == "__main__":
+#     app = QApplication(sys.argv)
+#     win = RFIDManager()
+#     win.show()
+#     sys.exit(app.exec())

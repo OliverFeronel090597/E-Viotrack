@@ -6,16 +6,20 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 
 from libs import GlobalVariable
+from libs.DatabaseConnector import DatabaseConnector
 
 
 class AdminPage(QWidget):
     """Reusable login widget with automatic replacement after successful login."""
-    def __init__(self):
+    def __init__(self, db : DatabaseConnector, login_type : QLabel):
         super().__init__()
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.main_layout)
+
+        self.db = db
+        self.login_type = login_type
 
         # Show login or post-login content depending on user state
         if not getattr(GlobalVariable, "user_login_type", None):
@@ -68,12 +72,17 @@ class AdminPage(QWidget):
         self.login_btn.setFixedWidth(200)
         self.login_btn.clicked.connect(self.attemptLogin)
 
+        # Label when login error
+        self.login_error = QLabel()
+        self.login_error.setObjectName("login_error")
+
         # Add widgets to layout
         self.login_layout.addWidget(self.user_label)
         self.login_layout.addWidget(self.user_input)
         self.login_layout.addWidget(self.pass_label)
         self.login_layout.addLayout(pass_layout)
         self.login_layout.addWidget(self.login_btn)
+        self.login_layout.addWidget(self.login_error)
 
         self.main_layout.addLayout(self.login_layout)
 
@@ -91,25 +100,30 @@ class AdminPage(QWidget):
         username = self.user_input.text().strip()
         password = self.pass_input.text().strip()
 
-        if self.verify_credentials(username, password):
+        if not username:
+            self.login_error.setText("Username required")
+            return
+
+        if not password:
+            self.login_error.setText("Password required")
+            return
+        
+        is_verify = self.db.authenticate_user(username, password)
+
+        if is_verify:
             # Save login globally
             GlobalVariable.user_login_type = username
+            user_type = self.db.get_system_user(username)
+            self.login_type.setText(f"USER: {username.upper()} {user_type["user_type"]}")
             # Remove login form
             self.clearLoginUI()
             # Show post-login content
             self.showContent()
         else:
             # Feedback for invalid login
-            self.user_input.clear()
+            # self.user_input.clear()
             self.pass_input.clear()
-            self.user_input.setPlaceholderText("Invalid username or password")
-
-    def verify_credentials(self, username: str, password: str) -> bool:
-        """
-        Replace with real authentication (DB) logic.
-        Dummy check: username='admin', password='1234'
-        """
-        return username == "admin" and password == "1234"
+            self.login_error.setText("Invalid username or password")
 
     # =====================
     # UTILITY TO CLEAR LOGIN
@@ -127,7 +141,7 @@ class AdminPage(QWidget):
             self.login_layout.setParent(None)
             del self.login_layout
 
-    def clearLayout(self, layout):
+    def clearLayout(self, layout: QVBoxLayout):
         """Recursively remove nested layouts and their widgets."""
         while layout.count():
             item = layout.takeAt(0)
