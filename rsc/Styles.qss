@@ -1,28 +1,13 @@
 /* ============================================================
    ROOT THEME TOKENS
    ============================================================ */
-:root {
-    --bg-main: #fafafa;
-    --bg-light: #f4f5f7;
-    --bg-card: #ffffff;
-    --bg-accent: #3acdfa;
-    --bg-danger: #f53030;
 
-    --border-light: #cccccc;
-    --border-dark: #2980b9;
-
-    --text-main: #222222;
-    --text-muted: #666666;
-    --text-invert: #ffffff;
-
-    --font-main: 'Segoe UI', Arial, sans-serif;
-}
 
 /* ============================================================
    GLOBAL
    ============================================================ */
-QWidget#central { background-color: var(--bg-main); }
-QWidget#nav     { background-color: var(--bg-accent); }
+QWidget#central { background-color: #fafafa; }
+QWidget#nav     { background-color: #3acdfa; }
 
 QToolTip {
     background-color: #2c2f33;
@@ -32,10 +17,10 @@ QToolTip {
     border-radius: 4px;
 }
 
-QLabel#imagelabel { border: 1px solid var(--bg-main); }
+QLabel#imagelabel { border: 1px solid #fafafa; }
 
 QTextEdit#qoute {
-    background-color: var(--bg-danger);
+    background-color: #f53030;
     color: #2c2f33;
 }
 
@@ -51,34 +36,34 @@ QLabel#userlogin {
 
 QLabel#login_error {
     font-size: 15px;
-    color: var(--bg-danger);
+    color: #f53030;
     font-weight: 500;
 }
 
 QLineEdit#userlogin,
 QLineEdit#passlogin {
-    border: 1px solid var(--border-light);
-    background-color: var(--bg-card);
-    color: var(--text-main);
+    border: 1px solid #cccccc;
+    background-color: #ffffff;
+    color: #222222;
     font-size: 18px;
     padding: 4px 6px;
 }
 
 /* Username Field */
 QLineEdit#userlogin { border-radius: 6px; }
-QLineEdit#userlogin:focus { border-color: var(--bg-danger); }
+QLineEdit#userlogin:focus { border-color: #f53030; }
 
 /* Password Field */
 QLineEdit#passlogin {
     border-radius: 6px 0 0 6px;
 }
 QLineEdit#passlogin:focus {
-    border-color: var(--bg-danger);
+    border-color: #f53030;
 }
 
 /* Show/Hide Password */
 QPushButton#showhide {
-    border: 1px solid var(--border-light);
+    border: 1px solid #cccccc;
     border-left: 0;
     border-radius: 0 6px 6px 0;
     background-color: #e1e1e1;
@@ -86,14 +71,14 @@ QPushButton#showhide {
     font-size: 12px;
 }
 QPushButton#showhide:hover {
-    border-color: var(--bg-danger);
-    background-color: var(--bg-card);
+    border-color: #f53030;
+    background-color: #ffffff;
 }
 
 /* Login Button */
 QPushButton#login {
     background-color: #0078d7;
-    color: var(--text-invert);
+    color: #ffffff;
     font-weight: 600;
     font-size: 14px;
     padding: 8px 12px;
@@ -108,12 +93,12 @@ QPushButton#login:hover {
    QUOTE CARD
    ============================================================ */
 QTextEdit#QuoteText {
-    background-color: var(--bg-card);
+    background-color: #ffffff;
     border-radius: 12px;
     border: 1px solid #ddd;
     padding: 10px;
-    color: var(--text-main);
-    font-family: var(--font-main);
+    color: #222222;
+    font-family: 'Segoe UI', Arial, sans-serif;
     font-size: 14px;
 
     selection-background-color: transparent;
@@ -121,7 +106,7 @@ QTextEdit#QuoteText {
 }
 
 QTextEdit#QuoteText:focus {
-    border: 1px solid var(--border-dark);
+    border: 1px solid #2980b9;
 }
 
 
@@ -145,10 +130,10 @@ QLineEdit#ViolationInput,
 QLineEdit#maxLineEdit {
     font-size: 14px;
     padding: 6px;
-    border: 1px solid var(--border-light);
+    border: 1px solid #cccccc;
     border-radius: 4px;
-    color: var(--text-main);
-    background-color: var(--bg-card);
+    color: #222222;
+    background-color: #ffffff;
 }
 
 QLineEdit#RFIDInput:focus,
@@ -160,10 +145,10 @@ QLineEdit#maxLineEdit:focus {
 QLabel#maxLineLabel {
     font-size: 14px;
     padding: 4px 6px;
-    border: 1px solid var(--border-light);
+    border: 1px solid #cccccc;
     border-radius: 4px;
-    background-color: var(--bg-card);
-    color: var(--text-main);
+    background-color: #ffffff;
+    color: #222222;
 }
 
 
@@ -179,10 +164,10 @@ QHeaderView::section {
 }
 
 QTreeView#ViolationTree {
-    background-color: var(--bg-card);
-    color: var(--text-main);
+    background-color: #ffffff;
+    color: #222222;
     font-size: 13px;
-    border: 1px solid var(--border-light);
+    border: 1px solid #cccccc;
     border-radius: 6px;
     gridline-color: #e0e0e0;
 }
@@ -192,7 +177,7 @@ QTreeView#ViolationTree::item {
 }
 
 QTreeView#ViolationTree::item:alternate {
-    background-color: var(--bg-light);
+    background-color: #f4f5f7;
 }
 
 QTreeView#ViolationTree::item:selected {
@@ -205,25 +190,25 @@ QTreeView#ViolationTree::item:selected {
 /* ============================================================
    RFID MANAGER
    ============================================================ */
-QWidget#rfidManager { background-color: var(--bg-main); }
+QWidget#rfidManager { background-color: #fafafa; }
 
 QWidget#portContainer {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-light);
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
     border-radius: 6px;
     padding: 6px;
 }
 
 QWidget#portRow {
-    background-color: var(--bg-light);
-    border: 1px solid var(--border-light);
+    background-color: #f4f5f7;
+    border: 1px solid #cccccc;
     border-radius: 4px;
     padding: 4px;
 }
 
 QCheckBox#portCheckBox {
     font-size: 14px;
-    color: var(--text-main);
+    color: #222222;
     padding: 2px;
 }
 
@@ -234,10 +219,10 @@ QCheckBox#portCheckBox {
 QComboBox#baudRateCombo {
     font-size: 14px;
     padding: 2px 4px;
-    border: 1px solid var(--border-light);
+    border: 1px solid #cccccc;
     border-radius: 4px;
-    background-color: var(--bg-card);
-    color: var(--text-main);
+    background-color: #ffffff;
+    color: #222222;
 }
 
 QComboBox#baudRateCombo:focus {
@@ -245,10 +230,10 @@ QComboBox#baudRateCombo:focus {
 }
 
 QComboBox#baudRateCombo QAbstractItemView {
-    background-color: var(--bg-card);
-    selection-background-color: var(--bg-accent);
-    selection-color: var(--text-invert);
-    color: var(--text-main);
+    background-color: #ffffff;
+    selection-background-color: #3acdfa;
+    selection-color: #ffffff;
+    color: #222222;
 }
 
 
@@ -264,7 +249,7 @@ QLabel#statusUser,
 QLabel#statusCenter,
 QLabel#statusVersion {
     font-size: 14px;
-    color: var(--text-muted);
+    color: #666666;
 }
 
 QLabel#statusVersion {
@@ -276,25 +261,25 @@ QLabel#statusVersion {
    QListWidget Scrollbar (Shared)
    ============================================================ */
 QListWidget#rfidTagList {
-    background-color: var(--bg-light);
-    border: 1px solid var(--border-dark);
+    background-color: #f4f5f7;
+    border: 1px solid #2980b9;
     border-radius: 6px;
     font-size: 13px;
-    color: var(--text-main);
+    color: #222222;
 }
 
 
 /* SHARED SCROLLBAR STYLE */
 QScrollBar:vertical,
 QScrollBar:horizontal {
-    background: var(--bg-card);
-    border: 1px solid var(--border-dark);
+    background: #ffffff;
+    border: 1px solid #2980b9;
     border-radius: 6px;
 }
 
 QScrollBar::handle:vertical,
 QScrollBar::handle:horizontal {
-    background-color: var(--bg-accent);
+    background-color: #3acdfa;
     min-height: 20px;
     min-width: 20px;
     border-radius: 6px;
@@ -331,14 +316,14 @@ QScrollBar::add-page {
    LOG WINDOW
    ============================================================ */
 QWidget#LogWindow {
-    background-color: var(--bg-light);
+    background-color: #f4f5f7;
 }
 
 QPlainTextEdit#LogView {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-dark);
+    background-color: #ffffff;
+    border: 1px solid #2980b9;
     border-radius: 6px;
     font-size: 13px;
-    color: var(--text-main);
+    color: #222222;
     padding: 6px;
 }

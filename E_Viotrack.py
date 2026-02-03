@@ -45,10 +45,11 @@ class E_Viotrack(QMainWindow):
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\rsc\Styles.qss",
+            r"rsc\Styles.qss",
             self
         )
         self.styles.check_file()
+        self.styles.save_actual_qss(r"rsc\Styles.qss",)
 
         # ICON LOADER
         def load_icon(path, size):
@@ -56,33 +57,33 @@ class E_Viotrack(QMainWindow):
                                              Qt.TransformationMode.SmoothTransformation))
 
         self.icon_expand = load_icon(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\LeftPanel.png",
+            r"img\LeftPanel.png",
             QSize(32, 32)
         )
         
         self.icon_collapse = load_icon(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\RightPanel.png",
+            r"img\RightPanel.png",
             QSize(32, 32)
         )
 
         self.logo_home = QPixmap(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\Home.png"
+            r"img\Home.png"
         )
         
         self.logo_admin = QPixmap(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\Admin.png"
+            r"img\Admin.png"
         )
 
         self.logo_logs = QPixmap(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\History.png"
+            r"img\History.png"
         )
 
         self.logo_advance = QPixmap(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\Advance.png"
+            r"img\Advance.png"
         )
 
         self.logo_settings = QPixmap(
-            r"C:\Users\O.Feronel\OneDrive - ams OSRAM\Documents\PYTHON\RFID_LONG_RANGE\img\Settings.png"
+            r"img\Settings.png"
         )
 
         # ROOT UI

@@ -45,7 +45,7 @@ class AdminPage(QWidget):
 
         # Password
         self.pass_label = QLabel("Password:")
-        self.pass_label.setObjectName("userlogin")
+        self.pass_label.setObjectName("passlogin")
 
         pass_layout = QHBoxLayout()
         pass_layout.setSpacing(0)
