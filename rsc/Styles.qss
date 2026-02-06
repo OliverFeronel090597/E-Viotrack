@@ -40,8 +40,7 @@ QLabel#login_error {
     font-weight: 500;
 }
 
-QLineEdit#userlogin,
-QLineEdit#passlogin {
+QLineEdit#userlogin{
     border: 1px solid #cccccc;
     background-color: #ffffff;
     color: #222222;
@@ -50,26 +49,42 @@ QLineEdit#passlogin {
 }
 
 /* Username Field */
-QLineEdit#userlogin { border-radius: 6px; }
-QLineEdit#userlogin:focus { border-color: #f53030; }
+QLineEdit#userlogin { 
+    border-radius: 6px; 
+    }
+
+QLineEdit#userlogin:focus { 
+    border-color: #f53030; 
+    }
 
 /* Password Field */
 QLineEdit#passlogin {
-    border-radius: 6px 0 0 6px;
+    border: 1px solid #cccccc;
+    background-color: #ffffff;
+    color: #222222;
+    font-size: 18px;
+    padding: 4px 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+
 }
 QLineEdit#passlogin:focus {
     border-color: #f53030;
 }
 
+
 /* Show/Hide Password */
 QPushButton#showhide {
     border: 1px solid #cccccc;
-    border-left: 0;
-    border-radius: 0 6px 6px 0;
-    background-color: #e1e1e1;
-    padding: 4px 8px;
-    font-size: 12px;
+    border-left: none;        /* remove left border */
+    background-color: #ffffff;
+    color: #222222;
+    font-size: 18px;
+    padding: 4px 6px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
 }
+
 QPushButton#showhide:hover {
     border-color: #f53030;
     background-color: #ffffff;
@@ -313,7 +328,7 @@ QScrollBar::add-page {
 
 
 /* ============================================================
-   LOG WINDOW
+   LOG WINDOW / ADMIN
    ============================================================ */
 QWidget#LogWindow {
     background-color: #f4f5f7;
@@ -326,4 +341,157 @@ QPlainTextEdit#LogView {
     font-size: 13px;
     color: #222222;
     padding: 6px;
+}
+
+ /* ==========================
+   TABLES
+========================== */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    gridline-color: #e5e5e5;
+    selection-background-color: #cce5ff;
+    selection-color: #000000;
+    color: #000000;
+}
+
+QTableWidget::item {
+    padding: 4px;
+}
+
+QHeaderView::section {
+    background-color: #3498db;
+    color: #ffffff;
+    font-weight: bold;
+    border: 1px solid #2980b9;
+    padding: 4px;
+}
+
+/* ==========================
+   LINE EDITS
+========================== */
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #222222;
+}
+
+QLineEdit:focus {
+    border-color: #3498db;
+    background-color: #ffffff;
+}
+
+/* ==========================
+   LABELS
+========================== */
+QLabel {
+    color: #222222;
+    font-size: 14px;
+}
+
+/* ==========================
+   PUSH BUTTONS
+========================== */
+QPushButton {
+    background-color: #0078d7;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #005a9e;
+}
+
+QPushButton#deleteBtn {
+    background-color: #c0392b;
+    color: #ffffff;
+}
+
+QPushButton#deleteBtn:hover {
+    background-color: #992d22;
+}
+
+QPushButton#cancelBtn {
+    background-color: #cccccc;
+    color: #222222;
+}
+
+QPushButton#cancelBtn:hover {
+    background-color: #aaaaaa;
+}
+
+/* ==========================
+   DIALOGS
+========================== */
+QDialog {
+    background-color: #fafafa;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+}
+
+/* ==========================
+   COMBOBOXES
+========================== */
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    padding: 4px 6px;
+    min-height: 24px;
+}
+
+QComboBox:focus {
+    border-color: #3498db;
+}
+
+/* ==========================
+   SEARCH LABELS
+========================== */
+QLabel#labelSearch {
+    font-size: 14px;
+    color: #222222;
+}
+
+/* ==========================
+   SPECIFIC LINE EDIT IDs
+========================== */
+QLineEdit#searchInput {
+    font-size: 14px;
+}
+
+QLineEdit#fullNameInput,
+QLineEdit#userNameInput,
+QLineEdit#passwordInput,
+QLineEdit#confirmPasswordInput,
+QLineEdit#driverIDInput,
+QLineEdit#rfidInput,
+QLineEdit#vehicleInput {
+    font-size: 14px;
+}
+
+/* ==========================
+   TABLE SELECTION
+========================== */
+QTableWidget::item:selected {
+    background-color: #cce5ff;
+    color: #000000;
+}
+
+/* ==========================
+   HEADER ALIGN
+========================== */
+QHeaderView::section {
+    text-align: center;
+}
+
+/* ==========================
+   ICON BUTTONS
+========================== */
+QPushButton#showHideBtn {
+    background-color: transparent;
+    border: none;
 }

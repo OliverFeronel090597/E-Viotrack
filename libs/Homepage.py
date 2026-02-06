@@ -161,7 +161,7 @@ class HomePage(QWidget):
     def handle_add_violation(self, rfid=None):
         print(rfid)
         if not rfid:
-            QMessageBox.warning(self, "Input Error", "Please enter RFID.")
+            #QMessageBox.warning(self, "Input Error", "Please enter RFID.")
             return
 
         active_violations = self.db.get_active_violations_by_rfid(rfid)

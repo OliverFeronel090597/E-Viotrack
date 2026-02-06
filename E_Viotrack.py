@@ -1,23 +1,21 @@
-from PyQt6.QtWidgets import (
-    QMainWindow, QApplication, QWidget,
-    QVBoxLayout, QHBoxLayout, QPushButton,
+from PyQt6.QtWidgets            import (
+    QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QStatusBar, QFrame, QSizePolicy
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QSize
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize
+from PyQt6.QtGui                import QIcon, QPixmap
 import sys
 
 
 # Absolute path to the folder containing this script,
 from libs.Animatedstack         import AnimatedStack
 from libs.stylesheetModefier    import StylesheetModifier
-
 from libs.Homepage              import HomePage
-from libs.LogPage import LogPage
+from libs.LogPage               import LogPage
 from libs.Settings              import RFIDManager
-from libs.Adminpage import AdminPage
-from libs.DatabaseConnector import DatabaseConnector
-from libs.Globalenentfilter import GlobalActivityLogger
+from libs.Adminpage             import AdminPage
+from libs.DatabaseConnector     import DatabaseConnector
+from libs.Globalenentfilter     import GlobalActivityLogger
 
 
 

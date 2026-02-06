@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer, QThread
 from libs.DatabaseConnector import DatabaseConnector
+import re
 
 BAUD_RATES = [9600, 19200, 38400, 57600, 115200, 230400]
 
@@ -50,12 +51,19 @@ class RFIDWorker(QObject):
             if line:
                 tag = line.decode(errors="ignore").strip()
                 if tag:
-                    self.tag_signal.emit(self.port, tag)
+                    tag = self.get_int_signed(tag)  # this returns int
+                    if tag is not None:
+                        self.tag_signal.emit(self.port, str(tag))   # FIX: must be string
+                    else:
+                        self.tag_signal.emit(self.port, "")         # or ignore
 
         self.stop()
         self.finished.emit(self.port)
         print(f"[{self.port}] Worker stopped")
 
+    def get_int_signed(self, s: str):
+        m = re.search(r"[+-]?\d+", s)
+        return int(m.group()) if m else None
 
 # ===================== RFID Manager =====================
 class RFIDManager(QWidget):
@@ -234,7 +242,7 @@ class RFIDManager(QWidget):
             self.tag_list.takeItem(0)
         self.tag_list.scrollToBottom()
         try:
-            if hasattr(self.upfdate_rfid, "handle_add_violation"):
+            if hasattr(self.upfdate_rfid, "handle_add_violation") and tag:
                 self.upfdate_rfid.handle_add_violation(tag)
         except Exception as e:
             print("RFID process error:", e)

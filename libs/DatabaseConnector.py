@@ -185,7 +185,6 @@ class DatabaseConnector:
     # =====================
     # DRIVER FUNCTIONS
     # =====================
-
     def add_driver(
         self,
         driver_id: str,
@@ -225,6 +224,15 @@ class DatabaseConnector:
         query = f"UPDATE drivers SET {', '.join(updates)} WHERE driver_id=?"
         result = self.execute_query(query, tuple(params))
         return result is None
+
+    def load_drivers(self):
+        query = "SELECT driver_id, rfid_serial, full_name, created_at, vehicle FROM drivers"
+        return self.execute_query(query, fetch_all=True)
+
+    def delete_driver(self, driver_id):
+        query = query = "DELETE FROM violations WHERE id=?"
+        return self.execute_query(query,(driver_id,))
+
 
     # =====================
     # VIOLATION FUNCTIONS
@@ -330,6 +338,63 @@ class DatabaseConnector:
                 "violation", "vehicle", "date", "due_date", "amount", "paid"]
         return [dict(zip(keys, row)) for row in rows]
 
+# =====================
+# VIOLATION_TYPE FUNCTIONS
+# =====================
+    def add_violation_type(self, violation_type: str, amount: float) -> bool:
+        query = """
+            INSERT INTO violations_type (violation_type, amount)
+            VALUES (?, ?)
+        """
+        result = self.execute_query(query, (violation_type, amount))
+        return result is None
+
+    def update_violation_type(
+        self,
+        violation_id: int,
+        violation_type: str = None,
+        amount: float = None
+    ) -> bool:
+        updates, params = [], []
+
+        if violation_type is not None:
+            updates.append("violation_type=?")
+            params.append(violation_type)
+
+        if amount is not None:
+            updates.append("amount=?")
+            params.append(amount)
+
+        if not updates:
+            return False  # nothing to update
+
+        params.append(violation_id)
+        query = f"UPDATE violations_type SET {', '.join(updates)} WHERE id=?"
+        result = self.execute_query(query, tuple(params))
+        return result is None
+
+    def delete_violation_type(self, violation_id: int) -> bool:
+        query = "DELETE FROM violations_type WHERE id=?"
+        result = self.execute_query(query, (violation_id,))
+        return result is None
+
+    def get_violation_type(self, violation_id: int):
+        query = "SELECT id, violation_type, amount FROM violations_type WHERE id=?"
+        row = self.execute_query(query, (violation_id,), fetch_one=True)
+        if row:
+            return {"id": row[0], "violation_type": row[1], "amount": row[2]}
+        return None
+
+    def list_violation_types(self):
+        query = "SELECT id, violation_type, amount FROM violations_type ORDER BY violation_type"
+        rows = self.execute_query(query, fetch_all=True)
+        if not rows:
+            return []
+
+        return [
+            {"id": r[0], "violation_type": r[1], "amount": r[2]}
+            for r in rows
+        ]
 
 # =====================
 # COMPORT FUNCTIONS

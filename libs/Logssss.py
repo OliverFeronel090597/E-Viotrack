@@ -15,7 +15,7 @@ class SerialReaderThread(QThread):
     data_received = pyqtSignal(str)
     error_occurred = pyqtSignal(str)
 
-    def __init__(self, port: str, baudrate: int = 9600, parent=None):
+    def __init__(self, port: str, baudrate: int = None, parent=None):
         super().__init__(parent)
         self.port_name = port
         self.baudrate = baudrate
