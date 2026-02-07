@@ -14,6 +14,7 @@ from libs.Homepage              import HomePage
 from libs.LogPage               import LogPage
 from libs.Settings              import RFIDManager
 from libs.Adminpage             import AdminPage
+from libs.AdvancePage           import AdvancePage
 from libs.DatabaseConnector     import DatabaseConnector
 from libs.Globalenentfilter     import GlobalActivityLogger
 
@@ -158,6 +159,7 @@ class E_Viotrack(QMainWindow):
         self.home_page = HomePage(self.db)
         self.admin_page = AdminPage(self.db, self.login_type)
         self.log_page = LogPage()
+        self.advance_page = AdvancePage(self.db)
         self.settings_page = RFIDManager(self.home_page, self.db)
 
         # STACK
@@ -165,6 +167,7 @@ class E_Viotrack(QMainWindow):
         self.stack.addWidget(self.home_page)
         self.stack.addWidget(self.admin_page)
         self.stack.addWidget(self.log_page)
+        self.stack.addWidget(self.advance_page)
         self.stack.addWidget(self.settings_page)
 
         self.root_layout.addWidget(self.nav_widget)
@@ -174,7 +177,8 @@ class E_Viotrack(QMainWindow):
         self.btn_home.clicked.connect(lambda: self.stack.slide_to(0))
         self.btn_admin.clicked.connect(lambda: self.stack.slide_to(1))
         self.btn_logs.clicked.connect(lambda: self.stack.slide_to(2))
-        self.btn_settings.clicked.connect(lambda: self.stack.slide_to(3))
+        self.btn_advance.clicked.connect(lambda: self.stack.slide_to(3))
+        self.btn_settings.clicked.connect(lambda: self.stack.slide_to(4))
 
     # -------------------- SEPARATOR --------------------
     def create_separator(self, direction="h"):

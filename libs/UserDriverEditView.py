@@ -1,34 +1,19 @@
 import sys
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QDialog, QLineEdit, QLabel, QPushButton, QComboBox, QMessageBox, QMenu
+    QDialog, QLineEdit, QLabel, QPushButton, QComboBox, QMessageBox, QMenu, QSplitter
 )
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QIcon, QKeyEvent
+from PyQt6.QtCore import Qt, QTimer
 
 # Safe import
 try:
     from libs.DatabaseConnector import DatabaseConnector
+    from libs.AutoCapital import AutoCapLineEdit
 except ImportError:
     from DatabaseConnector import DatabaseConnector
+    from AutoCapital import AutoCapLineEdit
 
 USER_TYPES = ["ADMIN", "OPERATOR"]
-
-# ==========================
-# AUTO-CAPITALIZE LINEEDIT
-# ==========================
-class AutoCapLineEdit(QLineEdit):
-    def keyPressEvent(self, event: QKeyEvent):
-        super().keyPressEvent(event)
-        if event.text() and not event.modifiers() & Qt.KeyboardModifier.ControlModifier:
-            cursor_pos = self.cursorPosition()
-            text = self.text()
-            capitalized = " ".join(word.capitalize() if word.strip() else word for word in text.split(" "))
-            if capitalized != text:
-                self.blockSignals(True)
-                self.setText(capitalized)
-                self.blockSignals(False)
-                self.setCursorPosition(cursor_pos)
 
 # ==========================
 # EDIT USER DIALOG
@@ -151,7 +136,8 @@ class UserTableWidget(QWidget):
             self.table.setItem(r, 0, QTableWidgetItem(u["full_name"]))
             self.table.setItem(r, 1, QTableWidgetItem(u["user_name"]))
             self.table.setItem(r, 2, QTableWidgetItem(u["user_type"]))
-        self.table.resizeColumnsToContents()
+        QTimer.singleShot(100, self.table.resizeColumnsToContents)
+
 
     def filter_users(self, text):
         text = text.lower().strip()
@@ -288,13 +274,20 @@ class DriverTableWidget(QWidget):
         self.display_drivers()
         self.table.horizontalHeader().setStretchLastSection(True)
 
-    def display_drivers(self):
-        drivers = self.db.load_drivers()
+    def display_drivers(self, drivers=None):
+        # If no filtered list provided → load fresh list
+        if drivers is None:
+            self.all_drivers = self.db.load_drivers() or []
+            drivers = self.all_drivers
+
+        self.table.clearContents()
         self.table.setRowCount(len(drivers))
+
         for r, d in enumerate(drivers):
             for c, val in enumerate(d):
                 self.table.setItem(r, c, QTableWidgetItem(str(val)))
-        self.table.resizeColumnsToContents()
+
+        QTimer.singleShot(100, lambda: self.table.resizeColumnsToContents())
 
     def filter_drivers(self, text):
         text = text.lower().strip()
@@ -304,20 +297,17 @@ class DriverTableWidget(QWidget):
     def add_driver(self):
         dlg = EditDriverDialog(self.db, None, self)
         if dlg.exec():
-            self.db.load_drivers()
+            self.display_drivers()
 
     def edit_driver(self, row, col):
         driver_id = self.table.item(row, 0).text()
-        driver_data = self.db.execute_query(
-            "SELECT driver_id, rfid_serial, full_name, vehicle FROM drivers WHERE driver_id=?",
-            (driver_id,), fetch_one=True
-        )
-        driver_data = self.db.select_
+        print(driver_id)
+        driver_data = self.db.select_driver(driver_id)
         if driver_data:
             dlg = EditDriverDialog(self.db, {"driver_id": driver_data[0], "rfid_serial": driver_data[1],
                                              "full_name": driver_data[2], "vehicle": driver_data[3]}, self)
             if dlg.exec():
-                self.db.load_drivers()
+                self.display_drivers()
 
     def delete_driver(self):
         selected = self.table.selectedItems()
@@ -327,8 +317,9 @@ class DriverTableWidget(QWidget):
             confirm = QMessageBox.question(self, "Delete?", f"Delete driver {driver_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
+                print(driver_id)
                 self.db.delete_driver(driver_id)
-                self.db.load_drivers()
+                self.display_drivers()
 
     def show_context_menu(self, pos):
         item = self.table.itemAt(pos)
@@ -347,15 +338,35 @@ class DriverTableWidget(QWidget):
 # ==========================
 # MAIN WINDOW SIDE BY SIDE
 # ==========================
+from PyQt6.QtWidgets import QWidget, QSplitter, QHBoxLayout
+from PyQt6.QtCore import Qt
+
 class UserDriver(QWidget):
     def __init__(self, db, parent=None):
         super().__init__(parent)
         self.db = db
         self.setWindowTitle("Admin Panel")
         self.resize(1200, 500)
+
+        # Create a horizontal splitter
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        # Add tables to the splitter
+        self.user_table = UserTableWidget(db)
+        self.driver_table = DriverTableWidget(db)
+        splitter.addWidget(self.user_table)
+        splitter.addWidget(self.driver_table)
+
+        # Optional: initial width ratio
+        splitter.setSizes([700, 500])
+
+        # Prevent collapsing completely
+        splitter.setChildrenCollapsible(False)
+
+        # Use a layout to hold the splitter
         layout = QHBoxLayout()
-        layout.addWidget(UserTableWidget(db))
-        layout.addWidget(DriverTableWidget(db))
+        layout.addWidget(splitter)
+        layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(layout)
 
 # ==========================

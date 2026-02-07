@@ -19,8 +19,8 @@ class GlobalActivityLogger(QObject):
         full_msg = f"[{timestamp}] {msg}"
         if self.log_callback:
             self.log_callback(full_msg)
-        else:
-            print(full_msg)
+        # else:
+        #     print(full_msg)
 
     def _should_log(self, event_hash: str) -> bool:
         now = datetime.now()

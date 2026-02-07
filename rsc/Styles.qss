@@ -442,10 +442,18 @@ QComboBox {
     border-radius: 6px;
     padding: 4px 6px;
     min-height: 24px;
+    color: black;
 }
 
 QComboBox:focus {
     border-color: #3498db;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    selection-background-color: #3acdfa;
+    selection-color: #ffffff;
+    color: #222222;
 }
 
 /* ==========================

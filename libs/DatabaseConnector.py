@@ -3,6 +3,7 @@ import os
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 import hashlib
+import inspect
 
 class DatabaseConnector:
     def __init__(self):
@@ -87,6 +88,7 @@ class DatabaseConnector:
     # =====================
     
     def execute_query(
+        
         self,
         query: str,
         params: Optional[tuple] = None,
@@ -94,6 +96,11 @@ class DatabaseConnector:
         fetch_all: bool = False
     ) -> Union[None, tuple, List[tuple]]:
         """Execute SQL query safely."""
+        frame = inspect.stack()[1].frame
+        cls = frame.f_locals.get('self').__class__.__name__ if 'self' in frame.f_locals else None
+        func = inspect.stack()[1].function
+        print(f"Called by: {cls}.{func}" if cls else f"Called by: {func}")
+        
         with self.connect() as conn:
             if conn is None:
                 return None
@@ -229,10 +236,14 @@ class DatabaseConnector:
         query = "SELECT driver_id, rfid_serial, full_name, created_at, vehicle FROM drivers"
         return self.execute_query(query, fetch_all=True)
 
-    def delete_driver(self, driver_id):
-        query = query = "DELETE FROM violations WHERE id=?"
-        return self.execute_query(query,(driver_id,))
+    def delete_driver(self, driver_id: str) -> bool:
+        query = "DELETE FROM drivers WHERE driver_id=?"
+        result = self.execute_query(query, (driver_id,))
+        return result is None
 
+    def select_driver(self, driver_id):
+        query = "SELECT driver_id, rfid_serial, full_name, vehicle FROM drivers WHERE driver_id=?"
+        return self.execute_query(query, (driver_id, ), fetch_one=True)
 
     # =====================
     # VIOLATION FUNCTIONS
@@ -247,18 +258,19 @@ class DatabaseConnector:
         violation: str,
         vehicle: str,
         date: str,
+        amount: float,
         due_date: str,
         paid: int = 0
     ) -> bool:
         query = """
             INSERT INTO violations (
                 user, driver_name, driver_id, rfid_serial,
-                violation, vehicle, date, due_date, paid
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                violation, vehicle, date, amount, due_date, paid
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         result = self.execute_query(query, (
             user, driver_name, driver_id, rfid_serial,
-            violation, vehicle, date, due_date, paid
+            violation, vehicle, date, amount, due_date, paid
         ))
         return result is None
 
