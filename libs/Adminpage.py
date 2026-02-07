@@ -10,7 +10,7 @@ from libs.DatabaseConnector import DatabaseConnector
 # NOTE: Import your combined user/driver widget here
 # It must not be instantiated until login
 from libs.UserDriverEditView import UserDriver
-
+from libs import GlobalVariable
 
 class AdminPage(QWidget):
     """Admin page with login, post-login content, and logout."""
@@ -110,6 +110,7 @@ class AdminPage(QWidget):
             GlobalVariable.user_login_type = username
             user_type = self.db.get_system_user(username)
             self.login_type.setText(f"USER: {username.upper()} {user_type['user_type']}")
+            GlobalVariable.user_login_type = user_type['user_type']
             self.clearLoginUI()
             self.showContent()
         else:
@@ -165,7 +166,7 @@ class AdminPage(QWidget):
     def logout(self):
         # Clear login type
         GlobalVariable.user_login_type = None
-        self.login_type.setText("")
+        self.login_type.setText("USER:")
 
         # Remove user table and logout button
         if hasattr(self, "user_edit"):

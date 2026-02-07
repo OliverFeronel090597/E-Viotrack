@@ -70,10 +70,12 @@ class RFIDManager(QWidget):
     POLL_INTERVAL_MS = 2000
     MAX_TAG_LINES_DEFAULT = 1000  # fixed default
 
-    def __init__(self, upfdate_rfid, db: DatabaseConnector):
+    def __init__(self, upfdate_rfid, db: DatabaseConnector, connected_device: QLabel):
         super().__init__()
         self.setWindowTitle("Multi-RFID Manager")
         self.resize(600, 450)
+
+        self.connected_device = connected_device
 
         self.db = db
         self.upfdate_rfid = upfdate_rfid
@@ -130,6 +132,7 @@ class RFIDManager(QWidget):
         for port in self.current_ports - available:
             self.remove_port_widget(port)
 
+        self.update_device_counters()
         self.current_ports = available
 
     # -------------------- UI per port --------------------
@@ -216,6 +219,7 @@ class RFIDManager(QWidget):
         self.workers[port] = worker
         thread.start()
         print(f"[{port}] QThread started @ {baud}")
+        self.update_device_counters()
 
     def stop_reader(self, port):
         if port not in self.threads:
@@ -228,6 +232,7 @@ class RFIDManager(QWidget):
             thread.quit()
             thread.wait(500)
         print(f"[{port}] QThread stopped")
+        self.update_device_counters()
 
     def on_worker_finished(self, port):
         print(f"[{port}] Worker exit")
@@ -246,6 +251,32 @@ class RFIDManager(QWidget):
                 self.upfdate_rfid.handle_add_violation(tag)
         except Exception as e:
             print("RFID process error:", e)
+
+    def update_device_counters(self):
+        running = 0
+        not_running = 0
+        not_connected = 0
+
+        active_ports = self.current_ports
+        db_ports = {p["port"] for p in self.db.list_comports()}
+
+        # Running = thread alive
+        running = len(self.threads)
+
+        # Not running = Enabled via checkbox but worker not alive
+        for port, cb in self.checkboxes.items():
+            if cb.isChecked() and port not in self.threads:
+                not_running += 1
+
+        # Not connected = DB saved ports that are not physically present
+        for port in db_ports:
+            if port not in active_ports:
+                not_connected += 1
+
+        # Print to target label
+        self.connected_device.setText(
+            f"Running: {running} | Not Running: {not_running} | Not Connected: {not_connected}"
+        )
 
     # -------------------- Cleanup --------------------
     def closeEvent(self, event):

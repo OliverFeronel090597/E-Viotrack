@@ -5,7 +5,7 @@ import re
 
 
 class StylesheetModifier:
-    def __init__(self, path: str, parent: QWidget):
+    def __init__(self, path,  parent: QWidget=None):
         self.file_path = path
         self.parent = parent
         self.last_mtime = None

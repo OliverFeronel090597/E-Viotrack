@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="/resources">
+    <file>Admin.png</file>
+    <file>Advance.png</file>
+    <file>E-VioTrack.png</file>
+    <file>Hide.png</file>
+    <file>History.png</file>
+    <file>Home.png</file>
+    <file>LeftPanel.png</file>
+    <file>Mainlogo.png</file>
+    <file>RightPanel.png</file>
+    <file>Settings.png</file>
+    <file>Show.png</file>
+    <file>Styles.qss</file>
+  </qresource>
+</RCC>

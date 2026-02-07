@@ -2,14 +2,14 @@ from PyQt6.QtWidgets            import (
     QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QStatusBar, QFrame, QSizePolicy
 )
-from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize
+from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize, QFile
 from PyQt6.QtGui                import QIcon, QPixmap
 import sys
 
 
 # Absolute path to the folder containing this script,
 from libs.Animatedstack         import AnimatedStack
-from libs.stylesheetModefier    import StylesheetModifier
+from libs.AutoStyle             import StylesheetModifier
 from libs.Homepage              import HomePage
 from libs.LogPage               import LogPage
 from libs.Settings              import RFIDManager
@@ -17,7 +17,7 @@ from libs.Adminpage             import AdminPage
 from libs.AdvancePage           import AdvancePage
 from libs.DatabaseConnector     import DatabaseConnector
 from libs.Globalenentfilter     import GlobalActivityLogger
-
+from libs.resources             import * # QRCC 
 
 
 # -------------------- MAIN WINDOW --------------------
@@ -25,7 +25,7 @@ class E_Viotrack(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.setWindowTitle("E-Viotrack")
-        self.setWindowIcon(QIcon("img/E-VioTrack.png"))
+        self.setWindowIcon(QIcon(":/resources/E-VioTrack.png"))
         self.setGeometry(100, 100, 800, 600)
 
         # CREATE TASKBAR
@@ -44,11 +44,10 @@ class E_Viotrack(QMainWindow):
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
-            r"rsc\Styles.qss",
+            ":/resources/Styles.qss",
             self
         )
-        self.styles.check_file()
-        self.styles.save_actual_qss(r"rsc\Styles.qss",)
+        print(QFile(":/resources/Styles.qss").exists())
 
         # ICON LOADER
         def load_icon(path, size):
@@ -56,33 +55,33 @@ class E_Viotrack(QMainWindow):
                                              Qt.TransformationMode.SmoothTransformation))
 
         self.icon_expand = load_icon(
-            r"img\LeftPanel.png",
+            ":/resources/LeftPanel.png",
             QSize(32, 32)
         )
         
         self.icon_collapse = load_icon(
-            r"img\RightPanel.png",
+            ":/resources/RightPanel.png",
             QSize(32, 32)
         )
 
         self.logo_home = QPixmap(
-            r"img\Home.png"
+            ":/resources/Home.png"
         )
         
         self.logo_admin = QPixmap(
-            r"img\Admin.png"
+            ":/resources/Admin.png"
         )
 
         self.logo_logs = QPixmap(
-            r"img\History.png"
+            ":/resources/History.png"
         )
 
         self.logo_advance = QPixmap(
-            r"img\Advance.png"
+            ":/resources/Advance.png"
         )
 
         self.logo_settings = QPixmap(
-            r"img\Settings.png"
+            ":/resources/Settings.png"
         )
 
         # ROOT UI
@@ -160,7 +159,7 @@ class E_Viotrack(QMainWindow):
         self.admin_page = AdminPage(self.db, self.login_type)
         self.log_page = LogPage()
         self.advance_page = AdvancePage(self.db)
-        self.settings_page = RFIDManager(self.home_page, self.db)
+        self.settings_page = RFIDManager(self.home_page, self.db, self.connected_device)
 
         # STACK
         self.stack = AnimatedStack(duration=self.anim_duration)
