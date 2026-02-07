@@ -503,3 +503,79 @@ QPushButton#showHideBtn {
     background-color: transparent;
     border: none;
 }
+
+/* --------------------
+   Main menu bar
+   -------------------- */
+QMenuBar {
+    background-color: #023963;      
+    color: #FFFFFF;                  
+    spacing: 3px;                    
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 5px 15px;
+    margin: 0px;
+}
+
+QMenuBar::item:selected {
+    background-color: #3acdfa;
+}
+
+/* --------------------
+   Drop-down menus
+   -------------------- */
+QMenu {
+    background-color: #04365c;
+    color: #FFFFFF;
+    border: 1px solid #2667f5;
+}
+
+QMenu::item {
+    padding: 5px 25px;
+    margin: 0px;
+}
+
+QMenu::item:selected {
+    background-color: #1E90FF;   /* highlight color (blue) */
+    color: #FFFFFF;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #2980b9;
+    margin: 5px 10px 5px 10px;
+}
+
+/* --------------------
+   Disabled menu items
+   -------------------- */
+QMenu::item:disabled {
+    color: #3acdfa;
+}
+
+/* --------------------
+   Checkable items
+   -------------------- */
+QMenu::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QFrame[role="SlideNotification"] {
+    background-color: #82d0e7;
+    border-radius: 8px;
+    padding: 4px;
+    font-size: 14px;
+    border: 2px solid #0078d7;
+}
+
+QLabel[role="SlideNotificationLabel"] {
+    background-color: transparent;
+    color: #000000;
+    border-radius: 8px;
+    padding: 2px;
+    font-size: 14px;
+    font-family: 'Segoe UI';
+}

@@ -2,8 +2,8 @@ from PyQt6.QtWidgets            import (
     QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QStatusBar, QFrame, QSizePolicy
 )
-from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize, QFile
-from PyQt6.QtGui                import QIcon, QPixmap
+from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize, QFile, QTimer
+from PyQt6.QtGui                import QIcon, QPixmap, QAction
 import sys
 
 
@@ -17,6 +17,8 @@ from libs.Adminpage             import AdminPage
 from libs.AdvancePage           import AdvancePage
 from libs.DatabaseConnector     import DatabaseConnector
 from libs.Globalenentfilter     import GlobalActivityLogger
+from libs.About                 import AboutDialog
+from libs.NotificationManager   import NotificationManager
 from libs.resources             import * # QRCC 
 
 
@@ -28,11 +30,12 @@ class E_Viotrack(QMainWindow):
         self.setWindowIcon(QIcon(":/resources/E-VioTrack.png"))
         self.setGeometry(100, 100, 800, 600)
 
-        # CREATE TASKBAR
+        # CREATE TASKBAR | MENU
+        self.create_menu()
         self.create_taskbar()
 
         self.db = DatabaseConnector()
-        self.db._create_tables_if_not_exist()
+        self.about = AboutDialog(self)
 
         # NAV STATE
         self.nav_expanded = True
@@ -90,6 +93,8 @@ class E_Viotrack(QMainWindow):
         self.setCentralWidget(central)
         self.root_layout = QHBoxLayout(central)
         self.root_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.notification_manager = NotificationManager(central, position="right")
 
         # NAV BAR
         self.nav_widget = QWidget()
@@ -178,6 +183,14 @@ class E_Viotrack(QMainWindow):
         self.btn_logs.clicked.connect(lambda: self.stack.slide_to(2))
         self.btn_advance.clicked.connect(lambda: self.stack.slide_to(3))
         self.btn_settings.clicked.connect(lambda: self.stack.slide_to(4))
+
+        QTimer.singleShot(
+            5000,
+            lambda: self.notification_manager.show_notification(
+                f"{QApplication.applicationName()} {QApplication.applicationVersion()}"
+            )
+        )
+
 
     # -------------------- SEPARATOR --------------------
     def create_separator(self, direction="h"):
@@ -288,6 +301,53 @@ class E_Viotrack(QMainWindow):
             self.icon_expand if self.nav_expanded else self.icon_collapse
         )
 
+    # Inside your QMainWindow subclass
+    def create_menu(self):
+        menubar = self.menuBar()
+
+        # -----------------------
+        # File Menu
+        # -----------------------
+        file_menu = menubar.addMenu("File")
+
+        # About action
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about_dialog)
+        file_menu.addAction(about_action)
+
+        # Exit action
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+
+    # -----------------------
+    # Show About Dialog
+    # -----------------------
+    def show_about_dialog(self):
+        dlg = AboutDialog(QApplication.applicationVersion(), self)
+        dlg.exec()
+
+        # System Menu
+        # menu_title = "System" if not self.version_check(True) else "System 🔴"
+        # system_menu = menubar.addMenu(menu_title)
+        # check_update_action = QAction("Check for Updates", self)
+        # check_update_action.triggered.connect(self.version_check)
+        # system_menu.addAction(check_update_action)
+
+        # # Account Menu
+        # account_menu = menubar.addMenu("Account")
+        # login_action = QAction("Login", self)
+        # login_action.triggered.connect(lambda: self.acount_dialog("login"))
+        # account_menu.addAction(login_action)
+
+        # change_action = QAction("Change Password", self)
+        # change_action.triggered.connect(lambda: self.acount_dialog("change"))
+        # account_menu.addAction(change_action)
+
+        # new_action = QAction("New User", self)
+        # new_action.triggered.connect(lambda: self.acount_dialog("add"))
+        # account_menu.addAction(new_action)
+
     def create_taskbar(self):
         # Create status bar
         status = QStatusBar()
@@ -329,7 +389,7 @@ class E_Viotrack(QMainWindow):
 # -------------------- RUN --------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationVersion("0.0.1")
+    app.setApplicationVersion("1.0.0")
     app.setApplicationName("E-Viotrack")
     event_filter = GlobalActivityLogger()
     app.installEventFilter(event_filter)
