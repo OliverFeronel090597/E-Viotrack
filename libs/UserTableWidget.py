@@ -3,10 +3,6 @@ from PyQt6.QtWidgets import (
     QLineEdit, QLabel, QPushButton, QMessageBox, QMenu
 )
 from PyQt6.QtCore import Qt, QTimer
-try:
-    from libs.DatabaseConnector import DatabaseConnector
-except ImportError:
-    from DatabaseConnector import DatabaseConnector
 
 from libs.EditUserDialog import EditUserDialog
 
@@ -81,7 +77,9 @@ class UserTableWidget(QWidget):
         if selected:
             row = selected[0].row()
             user_name = self.table.item(row, 1).text()
-            confirm = QMessageBox.question(self, "Delete?", f"Delete user {user_name}?",
+            user_id = self.table.item(row, 2).text()
+            print(f"Username {user_name}")
+            confirm = QMessageBox.question(self, "Delete?", f"Delete user {user_name.upper()} Type {user_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 self.db.delete_system_user(user_name)

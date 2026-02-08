@@ -68,7 +68,7 @@ class HomePage(QWidget):
         self.main_layout.addWidget(self.delete_btn)
 
     def handle_add_violation(self, rfid=None):
-        print(rfid)
+        print(f"New RFID detected: {rfid}")
         if not rfid:
             #QMessageBox.warning(self, "Input Error", "Please enter RFID.")
             return

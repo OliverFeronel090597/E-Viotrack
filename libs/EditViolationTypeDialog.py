@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QPushButton, QMessageBox
 )
+from libs.AutoCapital import AutoCapLineEdit
 from libs.DatabaseConnector import DatabaseConnector
 
 
@@ -14,7 +15,7 @@ class EditViolationTypeDialog(QDialog):
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel("Violation Type"))
-        self.type_input = QLineEdit()
+        self.type_input = AutoCapLineEdit()
         self.type_input.setText(self.vtype_data.get("violation_type", ""))
         layout.addWidget(self.type_input)
 

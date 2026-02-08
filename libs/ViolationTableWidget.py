@@ -46,43 +46,44 @@ class ViolationTableWidget(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
 
     def load_violations(self):
-        rows = self.db.ger_all_violations()
+        rows = self.db.get_all_violations()
         self.all_violations = []
 
         for r in rows:
+            # Safe tuple access with default None if tuple is shorter
             v = {
-                "id": r[0],
-                "user": r[1],
-                "driver_name": r[2],
-                "driver_id": r[3],
-                "rfid_serial": r[4],
-                "violation": r[5],
-                "vehicle": r[6],
-                "issue_date": r[7],
-                "amount": r[8],
-                "due_date": r[9],
-                "paid": r[10],
+                "id": r[0] if len(r) > 0 else None,
+                "user": r[1] if len(r) > 1 else "",
+                "driver_name": r[2] if len(r) > 2 else "",
+                "driver_id": r[3] if len(r) > 3 else "",
+                "rfid_serial": r[4] if len(r) > 4 else "",
+                "violation": r[5] if len(r) > 5 else "",
+                "vehicle": r[6] if len(r) > 6 else "",
+                "issue_date": r[7] if len(r) > 7 else "",
+                "amount": r[8] if len(r) > 8 else 0,
+                "due_date": r[9] if len(r) > 9 else "",
+                "paid": r[10] if len(r) > 10 else "",
             }
-
             self.all_violations.append(v)
 
-        print_table(self.all_violations)   # full dict list
+        print_table(self.all_violations)
         self.display_violations(self.all_violations)
 
 
     def display_violations(self, violations):
         self.table.setRowCount(len(violations))
         for r, v in enumerate(violations):
-            self.table.setItem(r, 0, QTableWidgetItem(str(v.get("driver_name"   ,""     ))))
-            self.table.setItem(r, 1, QTableWidgetItem(str(v.get("driver_id"     ,""     ))))
-            self.table.setItem(r, 2, QTableWidgetItem(str(v.get("rfid_serial"   ,""     ))))
-            self.table.setItem(r, 3, QTableWidgetItem(str(v.get("violation"     ,""     ))))
-            self.table.setItem(r, 4, QTableWidgetItem(str(v.get("vehicle"       ,""     ))))
-            self.table.setItem(r, 5, QTableWidgetItem(str(v.get("date"          ,""     ))))
-            self.table.setItem(r, 6, QTableWidgetItem(str(v.get("amount"        ,0      ))))
-            self.table.setItem(r, 7, QTableWidgetItem(str(v.get("due_date"      ,""     ))))
-            self.table.setItem(r, 8, QTableWidgetItem(str(v.get("paid"          ,0      ))))
-        QTimer.singleShot(100, self.table.resizeColumnsToContents)
+            self.table.setItem(r, 0, QTableWidgetItem(str(v.get("driver_name", ""))))
+            self.table.setItem(r, 1, QTableWidgetItem(str(v.get("driver_id", ""))))
+            self.table.setItem(r, 2, QTableWidgetItem(str(v.get("rfid_serial", ""))))
+            self.table.setItem(r, 3, QTableWidgetItem(str(v.get("violation", ""))))
+            self.table.setItem(r, 4, QTableWidgetItem(str(v.get("vehicle", ""))))
+            self.table.setItem(r, 5, QTableWidgetItem(str(v.get("issue_date", ""))))
+            self.table.setItem(r, 6, QTableWidgetItem(str(v.get("amount", 0))))
+            self.table.setItem(r, 7, QTableWidgetItem(str(v.get("due_date", ""))))
+            self.table.setItem(r, 8, QTableWidgetItem(str(v.get("paid", ""))))
+
+        QTimer.singleShot(10, self.table.resizeColumnsToContents)
 
     def filter_violations(self, text):
         filtered = [v for v in self.all_violations if text.lower() in v.get("driver_name", "").lower() or text.lower() in v.get("violation", "").lower()]
@@ -119,19 +120,40 @@ class ViolationTableWidget(QWidget):
 
 
     def paid_violation(self):
+        # Check admin rights
         if not is_admin():
-            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            self.advance_parent.show_notification(
+                "Please Login as Admin To Access this Feature.",
+                icon="SP_MessageBoxWarning"
+            )
             return
+
         selected = self.table.selectedItems()
-        if selected:
-            row = selected[0].row()
-            violation_id = str(self.table.item(row, 1).text())
-            violator_name = str(self.table.item(row, 0).text())
-            # confirm = QMessageBox.question(self, "Delete?", f"Delete Violation of {violator_name} ID {violation_id}?",
-            #                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            # if confirm == QMessageBox.StandardButton.Yes:
-            #     self.db.delete_violation(violation_id)
-            #     self.load_violations()
+        if not selected:
+            self.advance_parent.show_notification(
+                "No violation selected.",
+                icon="SP_MessageBoxInformation"
+            )
+            return
+
+        row = selected[0].row()
+        violator_name = str(self.table.item(row, 0).text())
+        violator_id = str(self.table.item(row, 1).text())
+        violation_date = str(self.table.item(row, 5).text())  # optional if you want to filter by date
+
+        # Confirm action
+        confirm = QMessageBox.question(
+            self,
+            "Mark as Paid?",
+            f"Mark violation of {violator_name} (ID: {violator_id}) on {violation_date} as paid?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if confirm == QMessageBox.StandardButton.Yes:
+            # Updated DatabaseConnector method accepts date as filter
+            self.db.paid_violation(violator_id, violator_name, violation_date)
+            self.load_violations()
+
 
     def show_context_menu(self, pos):
         item = self.table.itemAt(pos)

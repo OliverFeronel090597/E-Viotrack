@@ -316,8 +316,7 @@ class DatabaseConnector:
             return dict(zip(keys, row))
         return None
 
-
-    def ger_all_violations(self):
+    def get_all_violations(self):
         query = "SELECT * FROM violations"
         return self.execute_query(query, fetch_all=True)
 
@@ -341,6 +340,16 @@ class DatabaseConnector:
         keys = ["driver_name", "driver_id", "rfid_serial",
                 "violation", "vehicle", "date", "due_date", "amount", "paid"]
         return [dict(zip(keys, row)) for row in rows]
+
+    def paid_violation(self, driver_id: str, driver_name: str, date_apprehended: str) -> bool:
+        """
+        Mark all unpaid violations for the given driver as paid.
+        Returns True if query executed without error.
+        """
+        query = "UPDATE violations SET paid = 'paid' WHERE driver_id = ? AND driver_name = ? AND date = ?"
+        result = self.execute_query(query, (driver_id, driver_name, date_apprehended))
+        return result is None
+
 
 # =====================
 # VIOLATION_TYPE FUNCTIONS

@@ -85,7 +85,8 @@ class DriverTableWidget(QWidget):
         if selected:
             row = selected[0].row()
             driver_id = self.table.item(row, 0).text()
-            confirm = QMessageBox.question(self, "Delete?", f"Delete driver {driver_id}?",
+            driver_name = self.table.item(row, 2).text()
+            confirm = QMessageBox.question(self, "Delete?", f"Delete driver {driver_name} ID {driver_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 print(driver_id)

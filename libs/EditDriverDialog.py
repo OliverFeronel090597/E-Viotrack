@@ -1,11 +1,10 @@
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QPushButton, QMessageBox
 )
+from libs.UniqueID import generate_unique_id
 try:
-    from libs.DatabaseConnector import DatabaseConnector
     from libs.AutoCapital import AutoCapLineEdit
 except ImportError:
-    from DatabaseConnector import DatabaseConnector
     from AutoCapital import AutoCapLineEdit
 
 
@@ -14,6 +13,7 @@ class EditDriverDialog(QDialog):
         super().__init__(parent)
         self.db = db
         self.driver_data = driver_data or {}
+        self.unique_id = generate_unique_id()
         self.setWindowTitle("Edit Driver" if driver_data else "New Driver")
         self.setMinimumWidth(350)
         layout = QVBoxLayout()
@@ -21,7 +21,7 @@ class EditDriverDialog(QDialog):
 
         layout.addWidget(QLabel("Driver ID"))
         self.driver_id_input = QLineEdit()
-        self.driver_id_input.setText(self.driver_data.get("driver_id", ""))
+        self.driver_id_input.setText(self.driver_data.get("driver_id") or self.unique_id)
         self.driver_id_input.setReadOnly(bool(driver_data))
         layout.addWidget(self.driver_id_input)
 

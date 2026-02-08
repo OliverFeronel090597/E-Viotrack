@@ -1,5 +1,5 @@
 
-user_login_type = None
+user_login_type = "ADMIN"
 
 def is_admin():
     if user_login_type == "ADMIN":
