@@ -94,8 +94,7 @@ class DatabaseConnector:
         query: str,
         params: Optional[tuple] = None,
         fetch_one: bool = False,
-        fetch_all: bool = False
-    ) -> Union[None, tuple, List[tuple]]:
+        fetch_all: bool = False) -> Union[None, tuple, List[tuple]]:
         """Execute SQL query safely."""
         frame = inspect.stack()[1].frame
         cls = frame.f_locals.get('self').__class__.__name__ if 'self' in frame.f_locals else None

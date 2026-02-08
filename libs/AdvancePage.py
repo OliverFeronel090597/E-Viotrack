@@ -9,6 +9,7 @@ from datetime import datetime
 try:
     from libs.DatabaseConnector import DatabaseConnector
     from libs.TablePrint import print_table
+    from libs.GlobalVariable import is_admin
 except ImportError:
     from DatabaseConnector import DatabaseConnector
 
@@ -181,9 +182,10 @@ class EditViolationDialog(QDialog):
 # TABLES
 # ==========================
 class ViolationTypeTableWidget(QWidget):
-    def __init__(self, db: DatabaseConnector):
-        super().__init__()
+    def __init__(self, db: DatabaseConnector, parent:AdvancePage=None):
+        super().__init__(parent)
         self.db = db
+        self.advance_parent = parent
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
 
@@ -231,11 +233,17 @@ class ViolationTypeTableWidget(QWidget):
         self.display_types(filtered)
 
     def add_type(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         dlg = EditViolationTypeDialog(self.db, None, self)
         if dlg.exec():
             self.load_types()
 
     def edit_type(self, row, col):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         vtype_id = int(self.table.item(row, 0).text())
         vtype_data = self.db.get_violation_type(vtype_id)
         if vtype_data:
@@ -244,6 +252,9 @@ class ViolationTypeTableWidget(QWidget):
                 self.load_types()
 
     def delete_type(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()
@@ -270,9 +281,10 @@ class ViolationTypeTableWidget(QWidget):
 
 
 class ViolationTableWidget(QWidget):
-    def __init__(self, db: DatabaseConnector):
-        super().__init__()
+    def __init__(self, db: DatabaseConnector, parent=None):
+        super().__init__(parent)
         self.db = db
+        self.advance_parent = parent
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
 
@@ -353,12 +365,18 @@ class ViolationTableWidget(QWidget):
             self.load_violations()
 
     def edit_violation(self, row, col):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         violation_data = self.all_violations[row]  # row index corresponds to self.all_violations
         dlg = EditViolationDialog(self.db, violation_data, self)
         if dlg.exec():
             self.load_violations()
 
     def delete_violation(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()
@@ -372,6 +390,9 @@ class ViolationTableWidget(QWidget):
 
 
     def paid_violation(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()
@@ -406,16 +427,17 @@ class ViolationTableWidget(QWidget):
 # MAIN WINDOW
 # ==========================
 class AdvancePage(QWidget):
-    def __init__(self, db: DatabaseConnector):
-        super().__init__()
+    def __init__(self, db: DatabaseConnector, parent=None):
+        super().__init__(parent)
         self.db = db
+        self.source_parent = parent
 
         # Use a horizontal splitter instead of a simple layout
         splitter = QSplitter(Qt.Orientation.Horizontal)
         
         # Add widgets to splitter
-        self.violation_table = ViolationTableWidget(db)
-        self.violation_type_table = ViolationTypeTableWidget(db)
+        self.violation_table = ViolationTableWidget(db, parent=self)
+        self.violation_type_table = ViolationTypeTableWidget(db, parent=self)
         splitter.addWidget(self.violation_table)
         splitter.addWidget(self.violation_type_table)
 
@@ -430,6 +452,40 @@ class AdvancePage(QWidget):
         layout.addWidget(splitter)
         layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(layout)
+
+        
+    def show_notification(self, message:str=None , icon:str=None):
+        """
+        position -> left right
+
+        Icon availble selction, default is SP_MessageBoxInformation
+
+        "SP_TitleBarMenuButton",
+        "SP_TitleBarMinButton",
+        "SP_TitleBarMaxButton",
+        "SP_TitleBarCloseButton",
+        "SP_MessageBoxInformation",
+        "SP_MessageBoxWarning",
+        "SP_MessageBoxCritical",
+        "SP_MessageBoxQuestion",
+        "SP_ArrowUp",
+        "SP_ArrowDown",
+        "SP_ArrowLeft",
+        "SP_ArrowRight",
+        "SP_DirHomeIcon",
+        "SP_DirIcon",
+        "SP_FileIcon",
+        "SP_TrashIcon",
+        "SP_DriveHDIcon",
+        "SP_DriveFDIcon",
+        "SP_DriveCDIcon",
+        "SP_ComputerIcon",
+        "SP_DesktopIcon",
+        "SP_DirOpenIcon",
+        "SP_BrowserReload",
+        "SP_BrowserStop",
+    """
+        self.source_parent.notification_manager.show_notification(message, icon_new=icon)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

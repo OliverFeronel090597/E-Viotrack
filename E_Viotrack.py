@@ -2,7 +2,7 @@ from PyQt6.QtWidgets            import (
     QMainWindow, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QStatusBar, QFrame, QSizePolicy
 )
-from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize, QFile, QTimer
+from PyQt6.QtCore               import Qt, QPropertyAnimation, QEasingCurve, QSize, QTimer
 from PyQt6.QtGui                import QIcon, QPixmap, QAction
 import sys
 
@@ -41,16 +41,17 @@ class E_Viotrack(QMainWindow):
         self.nav_expanded = True
         self.nav_width_expanded = 180
         self.nav_width_collapsed = 75
-        self.anim_duration = 250
+        self.anim_duration = 500
         self.selected_nav_btn = None
         
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
             ":/resources/Styles.qss",
+            #r"img\\Styles.qss",
             self
         )
-        print(QFile(":/resources/Styles.qss").exists())
+        # print(QFile(":/resources/Styles.qss").exists())
 
         # ICON LOADER
         def load_icon(path, size):
@@ -94,7 +95,7 @@ class E_Viotrack(QMainWindow):
         self.root_layout = QHBoxLayout(central)
         self.root_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.notification_manager = NotificationManager(central, position="right")
+        self.notification_manager = NotificationManager(parent=self, position="right")
 
         # NAV BAR
         self.nav_widget = QWidget()
@@ -120,7 +121,7 @@ class E_Viotrack(QMainWindow):
                 background: transparent; 
                 border: none; }
             QPushButton:hover { 
-                background-color: #3b3f45; }
+                background-color: #0078d7; }
         """)
 
         toggle_row.addWidget(self.toggle_btn)
@@ -163,7 +164,7 @@ class E_Viotrack(QMainWindow):
         self.home_page = HomePage(self.db)
         self.admin_page = AdminPage(self.db, self.login_type)
         self.log_page = LogPage()
-        self.advance_page = AdvancePage(self.db)
+        self.advance_page = AdvancePage(self.db, self)
         self.settings_page = RFIDManager(self.home_page, self.db, self.connected_device)
 
         # STACK
@@ -185,9 +186,10 @@ class E_Viotrack(QMainWindow):
         self.btn_settings.clicked.connect(lambda: self.stack.slide_to(4))
 
         QTimer.singleShot(
-            5000,
+            2000,
             lambda: self.notification_manager.show_notification(
-                f"{QApplication.applicationName()} {QApplication.applicationVersion()}"
+                f"{QApplication.applicationName()} {QApplication.applicationVersion()}",
+                icon_new="SP_MessageBoxInformation"
             )
         )
 
@@ -275,31 +277,29 @@ class E_Viotrack(QMainWindow):
         start = self.nav_widget.width()
         end = self.nav_width_collapsed if self.nav_expanded else self.nav_width_expanded
 
-        # animate width
+        # Animate width
         for prop in (b"minimumWidth", b"maximumWidth"):
             anim = QPropertyAnimation(self.nav_widget, prop)
             anim.setDuration(self.anim_duration)
             anim.setStartValue(start)
             anim.setEndValue(end)
             anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
+            
+            # Update text visibility during animation
+            anim.valueChanged.connect(self._update_nav_text_visibility)
             anim.start()
             setattr(self, f"_anim_{prop}", anim)
 
-        # correct show/hide logic
-        new_state = not self.nav_expanded
+        self.nav_expanded = not self.nav_expanded
+        # switch toggle icon
+        self.toggle_btn.setIcon(self.icon_expand if self.nav_expanded else self.icon_collapse)
+
+
+    def _update_nav_text_visibility(self, value):
+        """Show text only if nav is fully expanded, hide otherwise."""
+        fully_expanded = value >= self.nav_width_expanded
         for btn in self.nav_buttons:
-            btn.text_label.setVisible(new_state)
-
-        # force layout refresh
-        self.nav_widget.updateGeometry()
-        self.nav_widget.adjustSize()
-
-        self.nav_expanded = new_state
-
-        # correct icon switching
-        self.toggle_btn.setIcon(
-            self.icon_expand if self.nav_expanded else self.icon_collapse
-        )
+            btn.text_label.setVisible(fully_expanded)
 
     # Inside your QMainWindow subclass
     def create_menu(self):
@@ -389,7 +389,7 @@ class E_Viotrack(QMainWindow):
 # -------------------- RUN --------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationVersion("1.0.0")
+    app.setApplicationVersion("1.2.0")
     app.setApplicationName("E-Viotrack")
     event_filter = GlobalActivityLogger()
     app.installEventFilter(event_filter)

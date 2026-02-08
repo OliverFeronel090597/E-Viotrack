@@ -579,3 +579,4 @@ QLabel[role="SlideNotificationLabel"] {
     font-size: 14px;
     font-family: 'Segoe UI';
 }
+
