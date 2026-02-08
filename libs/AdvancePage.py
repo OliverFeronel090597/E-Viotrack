@@ -350,8 +350,9 @@ class ViolationTableWidget(QWidget):
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()
-            violation_id = int(self.table.item(row, 0).text())
-            confirm = QMessageBox.question(self, "Delete?", f"Delete Violation ID {violation_id}?",
+            violation_id = str(self.table.item(row, 1).text())
+            violator_name = str(self.table.item(row, 0).text())
+            confirm = QMessageBox.question(self, "Delete?", f"Delete Violation of {violator_name} ID {violation_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 self.db.delete_violation(violation_id)

@@ -302,8 +302,8 @@ class DatabaseConnector:
         result = self.execute_query(query, tuple(params))
         return result is None
 
-    def delete_violation(self, violation_id: int) -> bool:
-        query = "DELETE FROM violations WHERE id=?"
+    def delete_violation(self, violation_id: str) -> bool:
+        query = "DELETE FROM violations WHERE driver_id=?"
         result = self.execute_query(query, (violation_id,))
         return result is None
 
