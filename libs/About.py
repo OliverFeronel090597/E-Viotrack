@@ -44,7 +44,7 @@ class AboutDialog(QDialog):
             "<h1>E-VioTrack</h1>",
             f"<h2>Version: {self.version}</h2>",
             "<h3>Developer: Oliver Feronel</h3>",
-            "<h3>Owner: Eduard Caballe</h3>"
+            "<h3>Owner: Speedy Team</h3>"
         ]
 
         for item in app_info:

@@ -8,6 +8,7 @@ from datetime import datetime
 
 try:
     from libs.DatabaseConnector import DatabaseConnector
+    from libs.TablePrint import print_table
 except ImportError:
     from DatabaseConnector import DatabaseConnector
 
@@ -214,6 +215,7 @@ class ViolationTypeTableWidget(QWidget):
 
     def load_types(self):
         self.all_types = self.db.list_violation_types()
+        print_table(self.all_types)
         self.display_types(self.all_types)
 
     def display_types(self, types):
@@ -303,32 +305,42 @@ class ViolationTableWidget(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
 
     def load_violations(self):
-        self.all_violations = self.db.list_violations()
-        # Fix swapped keys: amount, due_date, paid
-        for v in self.all_violations:
-            # If due_date is a number, it's actually amount
-            if isinstance(v.get("due_date"), (int, float)):
-                v["amount"] = v["due_date"]
-                v["due_date"] = v.get("paid", "")   # move date string to due_date
-                v["paid"] = 0                        # reset paid if missing
-            else:
-                v.setdefault("amount", 0)
-                v.setdefault("due_date", "")
-                v.setdefault("paid", 0)
+        rows = self.db.ger_all_violations()
+        self.all_violations = []
+
+        for r in rows:
+            v = {
+                "id": r[0],
+                "user": r[1],
+                "driver_name": r[2],
+                "driver_id": r[3],
+                "rfid_serial": r[4],
+                "violation": r[5],
+                "vehicle": r[6],
+                "issue_date": r[7],
+                "amount": r[8],
+                "due_date": r[9],
+                "paid": r[10],
+            }
+
+            self.all_violations.append(v)
+
+        print_table(self.all_violations)   # full dict list
         self.display_violations(self.all_violations)
+
 
     def display_violations(self, violations):
         self.table.setRowCount(len(violations))
         for r, v in enumerate(violations):
-            self.table.setItem(r, 0, QTableWidgetItem(str(v.get("driver_name", ""))))
-            self.table.setItem(r, 1, QTableWidgetItem(str(v.get("driver_id", ""))))
-            self.table.setItem(r, 2, QTableWidgetItem(str(v.get("rfid_serial", ""))))
-            self.table.setItem(r, 3, QTableWidgetItem(str(v.get("violation", ""))))
-            self.table.setItem(r, 4, QTableWidgetItem(str(v.get("vehicle", ""))))
-            self.table.setItem(r, 5, QTableWidgetItem(str(v.get("date", ""))))
-            self.table.setItem(r, 6, QTableWidgetItem(str(v.get("amount", 0))))   # amount is float
-            self.table.setItem(r, 7, QTableWidgetItem(str(v.get("due_date", ""))))
-            self.table.setItem(r, 8, QTableWidgetItem(str(v.get("paid", 0))))
+            self.table.setItem(r, 0, QTableWidgetItem(str(v.get("driver_name"   ,""     ))))
+            self.table.setItem(r, 1, QTableWidgetItem(str(v.get("driver_id"     ,""     ))))
+            self.table.setItem(r, 2, QTableWidgetItem(str(v.get("rfid_serial"   ,""     ))))
+            self.table.setItem(r, 3, QTableWidgetItem(str(v.get("violation"     ,""     ))))
+            self.table.setItem(r, 4, QTableWidgetItem(str(v.get("vehicle"       ,""     ))))
+            self.table.setItem(r, 5, QTableWidgetItem(str(v.get("date"          ,""     ))))
+            self.table.setItem(r, 6, QTableWidgetItem(str(v.get("amount"        ,0      ))))
+            self.table.setItem(r, 7, QTableWidgetItem(str(v.get("due_date"      ,""     ))))
+            self.table.setItem(r, 8, QTableWidgetItem(str(v.get("paid"          ,0      ))))
         QTimer.singleShot(100, self.table.resizeColumnsToContents)
 
     def filter_violations(self, text):
@@ -358,6 +370,19 @@ class ViolationTableWidget(QWidget):
                 self.db.delete_violation(violation_id)
                 self.load_violations()
 
+
+    def paid_violation(self):
+        selected = self.table.selectedItems()
+        if selected:
+            row = selected[0].row()
+            violation_id = str(self.table.item(row, 1).text())
+            violator_name = str(self.table.item(row, 0).text())
+            # confirm = QMessageBox.question(self, "Delete?", f"Delete Violation of {violator_name} ID {violation_id}?",
+            #                                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            # if confirm == QMessageBox.StandardButton.Yes:
+            #     self.db.delete_violation(violation_id)
+            #     self.load_violations()
+
     def show_context_menu(self, pos):
         item = self.table.itemAt(pos)
         if item:
@@ -365,12 +390,16 @@ class ViolationTableWidget(QWidget):
             menu = QMenu(self)
             edit_action = menu.addAction("Edit Violation")
             delete_action = menu.addAction("Delete Violation")
+            paid_action = menu.addAction("Violation Paid")
             action = menu.exec(self.table.mapToGlobal(pos))
             if action == edit_action:
                 self.edit_violation(row, 0)
             elif action == delete_action:
                 self.table.selectRow(row)
                 self.delete_violation()
+            elif action == paid_action:
+                self.paid_violation()
+
 
 
 # ==========================

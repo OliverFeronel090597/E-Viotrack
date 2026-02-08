@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from typing import Optional, List, Dict, Any, Union
+from warnings import deprecated
 from datetime import datetime
 import hashlib
 import inspect
@@ -316,18 +317,10 @@ class DatabaseConnector:
             return dict(zip(keys, row))
         return None
 
-    def list_violations(self, driver_id: str = None) -> List[Dict[str, Any]]:
-        if driver_id:
-            query = "SELECT * FROM violations WHERE driver_id=?"
-            rows = self.execute_query(query, (driver_id,), fetch_all=True)
-        else:
-            query = "SELECT * FROM violations"
-            rows = self.execute_query(query, fetch_all=True)
-        if not rows:
-            return []
-        keys = ["id", "user", "driver_name", "driver_id", "rfid_serial",
-                "violation", "vehicle", "date", "due_date", "paid"]
-        return [dict(zip(keys, row)) for row in rows]
+
+    def ger_all_violations(self):
+        query = "SELECT * FROM violations"
+        return self.execute_query(query, fetch_all=True)
 
     def get_active_violations_by_rfid(self, rfid_serial: str) -> List[Dict[str, Any]]:
         """
