@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QLineEdit, QLabel, QPushButton, QMessageBox, QMenu
+    QLineEdit, QLabel, QPushButton, QMessageBox, QMenu, QApplication
 )
 from PyQt6.QtCore import Qt, QTimer
 from libs.DatabaseConnector import DatabaseConnector
@@ -13,7 +13,7 @@ class ViolationTableWidget(QWidget):
     def __init__(self, db: DatabaseConnector, parent=None):
         super().__init__(parent)
         self.db = db
-        self.advance_parent = parent
+        self.advance_parent: QApplication = parent
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
 
