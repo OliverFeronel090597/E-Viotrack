@@ -37,7 +37,8 @@ class RFIDWorker(QObject):
         while self.running:
             try:
                 line = self.ser.readline()
-            except Exception:
+            except Exception as e:
+                print(f"[{self.port}] Serial error:", e)
                 break
 
             if line:

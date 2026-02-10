@@ -7,18 +7,17 @@ from PyQt6.QtGui import QIcon
 from libs import GlobalVariable
 from libs.DatabaseConnector import DatabaseConnector
 
-# NOTE: Import your combined user/driver widget here
-# It must not be instantiated until login
 from libs.UserDriverEditView import UserDriver
 from libs import GlobalVariable
 
 class AdminPage(QWidget):
     """Admin page with login, post-login content, and logout."""
 
-    def __init__(self, db: DatabaseConnector, login_type: QLabel):
-        super().__init__()
+    def __init__(self, db: DatabaseConnector, login_type: QLabel, parent=None):
+        super().__init__(parent)
         self.db = db
         self.login_type = login_type
+        self.source_parent = parent
 
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -180,3 +179,36 @@ class AdminPage(QWidget):
 
         # Show login UI again
         self.initLoginUI()
+
+    def show_notification(self, message:str=None , icon:str=None):
+        """
+        position -> left right
+
+        Icon availble selction, default is SP_MessageBoxInformation
+
+        "SP_TitleBarMenuButton",
+        "SP_TitleBarMinButton",
+        "SP_TitleBarMaxButton",
+        "SP_TitleBarCloseButton",
+        "SP_MessageBoxInformation",
+        "SP_MessageBoxWarning",
+        "SP_MessageBoxCritical",
+        "SP_MessageBoxQuestion",
+        "SP_ArrowUp",
+        "SP_ArrowDown",
+        "SP_ArrowLeft",
+        "SP_ArrowRight",
+        "SP_DirHomeIcon",
+        "SP_DirIcon",
+        "SP_FileIcon",
+        "SP_TrashIcon",
+        "SP_DriveHDIcon",
+        "SP_DriveFDIcon",
+        "SP_DriveCDIcon",
+        "SP_ComputerIcon",
+        "SP_DesktopIcon",
+        "SP_DirOpenIcon",
+        "SP_BrowserReload",
+        "SP_BrowserStop",
+    """
+        self.source_parent.notification_manager.show_notification(message, icon_new=icon)

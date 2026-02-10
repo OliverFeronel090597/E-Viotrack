@@ -47,8 +47,8 @@ class E_Viotrack(QMainWindow):
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
-            ":/resources/Styles.qss",
-            #r"img\\Styles.qss",
+            #":/resources/Styles.qss",
+            r"img\\Styles.qss",
             self
         )
         # print(QFile(":/resources/Styles.qss").exists())
@@ -162,7 +162,7 @@ class E_Viotrack(QMainWindow):
 
         # WIDGETS
         self.home_page = HomePage(self.db)
-        self.admin_page = AdminPage(self.db, self.login_type)
+        self.admin_page = AdminPage(self.db, self.login_type, self)
         self.log_page = LogPage()
         self.advance_page = AdvancePage(self.db, self)
         self.settings_page = RFIDManager(self.home_page, self.db, self.connected_device)

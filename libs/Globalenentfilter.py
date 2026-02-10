@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QObject, QEvent
+from PyQt6.QtCore import QObject, QEvent, Qt
 from PyQt6.QtGui import QMouseEvent, QKeyEvent
 from datetime import datetime, timedelta
 
@@ -32,36 +32,31 @@ class GlobalActivityLogger(QObject):
 
     def eventFilter(self, obj: QObject, event: QEvent):
         event_type = event.type()
-        event_hash = None
 
-        # Mouse clicks
+        # Mouse press
         if isinstance(event, QMouseEvent) and event_type == QEvent.Type.MouseButtonPress:
-            event_hash = f"MOUSE-{obj.__class__.__name__}-{obj.objectName()}-{event.button().name}"
+            btn = event.button()
+            btn_name = {
+                Qt.MouseButton.LeftButton: "Left",
+                Qt.MouseButton.RightButton: "Right",
+                Qt.MouseButton.MiddleButton: "Middle",
+            }.get(btn, str(btn))
+
+            event_hash = f"MOUSE-{obj.__class__.__name__}-{obj.objectName()}-{btn_name}"
+
             if self._should_log(event_hash):
                 self.log(
-                    f"[MOUSE PRESS] Widget={obj.__class__.__name__} objectName='{obj.objectName()}' Button={event.button().name}"
+                    f"[MOUSE PRESS] Widget={obj.__class__.__name__} objectName='{obj.objectName()}' Button={btn_name}"
                 )
 
-        # Key presses
+        # Key press
         elif isinstance(event, QKeyEvent) and event_type == QEvent.Type.KeyPress:
-            event_hash = f"KEY-{obj.__class__.__name__}-{obj.objectName()}-{event.key()}"
+            key = event.key()
+            event_hash = f"KEY-{obj.__class__.__name__}-{obj.objectName()}-{key}"
+
             if self._should_log(event_hash):
                 self.log(
-                    f"[KEY PRESS] Widget={obj.__class__.__name__} objectName='{obj.objectName()}' Key={event.key()}"
+                    f"[KEY PRESS] Widget={obj.__class__.__name__} objectName='{obj.objectName()}' Key={key}"
                 )
-
-        # # Focus in/out
-        # elif event_type in (QEvent.Type.FocusIn, QEvent.Type.FocusOut):
-        #     event_hash = f"FOCUS-{obj.__class__.__name__}-{obj.objectName()}-{event_type}"
-        #     if self._should_log(event_hash):
-        #         action = "FOCUS IN" if event_type == QEvent.Type.FocusIn else "FOCUS OUT"
-        #         self.log(f"[{action}] Widget={obj.__class__.__name__} objectName='{obj.objectName()}'")
-
-        # # Hover enter/leave
-        # elif event_type in (QEvent.Type.Enter, QEvent.Type.Leave):
-        #     event_hash = f"HOVER-{obj.__class__.__name__}-{obj.objectName()}-{event_type}"
-        #     if self._should_log(event_hash):
-        #         action = "HOVER ENTER" if event_type == QEvent.Type.Enter else "HOVER LEAVE"
-        #         self.log(f"[{action}] Widget={obj.__class__.__name__} objectName='{obj.objectName()}'")
 
         return False

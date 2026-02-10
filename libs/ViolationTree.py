@@ -1,12 +1,13 @@
 from PyQt6.QtWidgets import (
     QTreeView, QHeaderView, QAbstractItemView
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QModelIndex, pyqtSignal
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from typing import Dict, Any
 
 
 class ViolationTree(QTreeView):
+    driver_clicked = pyqtSignal(str)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ViolationTree")
@@ -14,7 +15,7 @@ class ViolationTree(QTreeView):
 
         self.tree_model = QStandardItemModel()
         self.tree_model.setHorizontalHeaderLabels([
-            "Driver Name", "Driver ID", "RFID", "Violation", "Vehicle", "Amount", "Date", "Due Date", "Paid"
+            "Driver Name", "Driver ID", "RFID", "Violation", "Vehicle", "Amount", "Date", "Due Date", "Status"
         ])
         self.setModel(self.tree_model)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -26,6 +27,9 @@ class ViolationTree(QTreeView):
         header = self.header()
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         header.setStretchLastSection(False)
+
+        # Connect the click signal
+        self.clicked.connect(self.on_item_clicked)
 
     def clear_tree(self):
         self.tree_model.removeRows(0, self.tree_model.rowCount())
@@ -96,3 +100,13 @@ class ViolationTree(QTreeView):
             self.tree_model.removeRow(index.row(), index.parent())
         else:
             self.tree_model.removeRow(index.row())
+
+    def on_item_clicked(self, index: QModelIndex):
+        if not index.isValid():
+            return
+
+        # Only emit for top-level items (driver names)
+        if not index.parent().isValid():
+            driver_name = self.tree_model.itemFromIndex(index).text()
+            # Emit the signal
+            self.driver_clicked.emit(driver_name)

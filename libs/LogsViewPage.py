@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, 
-    QMessageBox, QScrollArea
+    QMessageBox, QScrollArea, QHBoxLayout
 )
 from PyQt6.QtCore import Qt, QSettings
 from libs.DatabaseConnector import DatabaseConnector
@@ -27,7 +27,6 @@ class LogsViewPage(QWidget):
         layout.addWidget(self.title_label)
 
         # Scrollable horizontal container
-        from PyQt6.QtWidgets import QHBoxLayout
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget()

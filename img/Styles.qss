@@ -580,3 +580,12 @@ QLabel[role="SlideNotificationLabel"] {
     font-family: 'Segoe UI';
 }
 
+QPlainTextEdit#driver_details{
+    background-color: transparent;
+    color: #000000;
+    border-radius: 8px;
+    padding: 2px;
+    font-size: 12px;
+    font-family: 'Segoe UI'; 
+}
+

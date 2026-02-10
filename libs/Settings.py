@@ -4,10 +4,9 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QCheckBox,
     QListWidget, QHBoxLayout, QComboBox, QLineEdit
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QTimer, QThread
+from PyQt6.QtCore import Qt, QTimer, QThread
 from libs.DatabaseConnector import DatabaseConnector
 from libs.RFIDWorker import RFIDWorker
-import re
 
 BAUD_RATES = [9600, 19200, 38400, 57600, 115200, 230400]
 
@@ -31,6 +30,7 @@ class RFIDManager(QWidget):
         self.workers = {}    # port -> RFIDWorker
         self.checkboxes = {} # port -> QCheckBox
         self.combos = {}     # port -> QComboBox
+        self.prev_comport_len = 0
         self.current_ports = set()
 
         layout = QVBoxLayout(self)
@@ -59,7 +59,7 @@ class RFIDManager(QWidget):
         lbl_tags.setObjectName("tagsLabel")
         layout.addWidget(lbl_tags)
 
-        self.tag_list = QListWidget()
+        self.tag_list = QListWidget(parent=self)
         self.tag_list.setObjectName("rfidTagList")
         layout.addWidget(self.tag_list)
 
@@ -72,15 +72,33 @@ class RFIDManager(QWidget):
 
     # -------------------- Port scan --------------------
     def check_ports(self):
-        available = {p.device for p in serial.tools.list_ports.comports()}
+        # Get all serial ports
+        ports = serial.tools.list_ports.comports()
 
+        # Only keep external USB-Serial ports (skip Bluetooth / virtual COMs)
+        valid_ports = []
+        for p in ports:
+            hwid = getattr(p, "hwid", "").upper()
+            if "BTHENUM" in hwid or "VIRTUAL" in hwid:
+                continue
+            valid_ports.append(p)
+
+        available = {p.device for p in valid_ports}
+        if len(available) != self.prev_comport_len:
+            print("Available USB-Serial ports:", available)
+            self.prev_comport_len = len(available)
+
+        # Add new ports
         for port in available - self.current_ports:
             self.add_port_widget(port)
+
+        # Remove missing ports
         for port in self.current_ports - available:
             self.remove_port_widget(port)
 
         self.update_device_counters()
         self.current_ports = available
+
 
     # -------------------- UI per port --------------------
     def add_port_widget(self, port):
@@ -156,43 +174,69 @@ class RFIDManager(QWidget):
     def start_reader(self, port, baud):
         if port in self.threads:
             return
+
         worker = RFIDWorker(port, baud)
         thread = QThread()
+
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
+
         worker.tag_signal.connect(self.on_tag_read)
         worker.finished.connect(self.on_worker_finished)
+
+        # Store references
         self.threads[port] = thread
         self.workers[port] = worker
+
         thread.start()
         print(f"[{port}] QThread started @ {baud}")
         self.update_device_counters()
 
-    def stop_reader(self, port):
-        if port not in self.threads:
-            return
-        worker = self.workers.pop(port, None)
-        thread = self.threads.pop(port, None)
-        if worker:
-            worker.stop()
-        if thread:
-            thread.quit()
-            thread.wait(500)
-        print(f"[{port}] QThread stopped")
-        self.update_device_counters()
 
-    def on_worker_finished(self, port):
-        print(f"[{port}] Worker exit")
+    def stop_reader(self, port):
+        """Safely stop a worker + thread"""
+        worker = self.workers.get(port)
+        thread = self.threads.get(port)
+
+        if not worker or not thread:
+            return
+
+        print(f"[{port}] Stopping reader...")
+
+        try:
+            worker.stop()
+        except:
+            pass
+
+        # ALWAYS quit the thread event loop
+        thread.quit()
+
+        # WAIT UNTIL IT FULLY STOPS  (no timeout)
+        thread.wait()
+
+        print(f"[{port}] Thread fully stopped")
+
+        # Now safe to delete references
         self.workers.pop(port, None)
         self.threads.pop(port, None)
+
+        self.update_device_counters()
+
+
+    def on_worker_finished(self, port):
+        """Worker ended → finish cleanup by stopping thread properly"""
+        print(f"[{port}] Worker finished")
+
+        # Don't delete thread here — call stop_reader (safe path)
+        self.stop_reader(port)
 
     # -------------------- Tag display --------------------
     def on_tag_read(self, port, tag):
         self.tag_list.addItem(f"{port} → {tag}")
         max_lines = self.MAX_TAG_LINES_DEFAULT
+        self.tag_list.scrollToBottom()
         while self.tag_list.count() > max_lines:
             self.tag_list.takeItem(0)
-        self.tag_list.scrollToBottom()
         try:
             if hasattr(self.upfdate_rfid, "handle_add_violation") and tag:
                 self.upfdate_rfid.handle_add_violation(tag)

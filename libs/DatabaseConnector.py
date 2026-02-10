@@ -57,7 +57,6 @@ class DatabaseConnector:
         ],
         "violations": [
             "id INTEGER PRIMARY KEY AUTOINCREMENT",
-            "user TEXT NOT NULL",
             "driver_name TEXT NOT NULL",
             "driver_id TEXT NOT NULL",
             "rfid_serial TEXT NOT NULL",
@@ -99,7 +98,7 @@ class DatabaseConnector:
         frame = inspect.stack()[1].frame
         cls = frame.f_locals.get('self').__class__.__name__ if 'self' in frame.f_locals else None
         func = inspect.stack()[1].function
-        print(f"Called by: {cls}.{func}" if cls else f"Called by: {func}")
+        #print(f"Called by: {cls}.{func}" if cls else f"Called by: {func}")
         
         with self.connect() as conn:
             if conn is None:
@@ -189,6 +188,10 @@ class DatabaseConnector:
         keys = ["id", "full_name", "user_name", "user_type"]
         return [dict(zip(keys, row)) for row in rows]
 
+    def select_all_user(self):
+        query = "SELECT user_name FROM system_users"
+        return self.execute_query(query, fetch_all=True)
+
     # =====================
     # DRIVER FUNCTIONS
     # =====================
@@ -244,6 +247,14 @@ class DatabaseConnector:
     def select_driver(self, driver_id):
         query = "SELECT driver_id, rfid_serial, full_name, vehicle FROM drivers WHERE driver_id=?"
         return self.execute_query(query, (driver_id, ), fetch_one=True)
+    
+    def get_all_driver(self):
+        query = "SELECT full_name from DRIVERS"
+        return self.execute_query(query, fetch_all=True)
+
+    def select_driver(self, driver):
+        query = "SELECT * from DRIVERS WHERE full_name = ?"
+        return self.execute_query(query,(driver,), fetch_all=True) 
 
     # =====================
     # VIOLATION FUNCTIONS
@@ -251,7 +262,6 @@ class DatabaseConnector:
 
     def add_violation(
         self,
-        user: str,
         driver_name: str,
         driver_id: str,
         rfid_serial: str,
@@ -264,12 +274,12 @@ class DatabaseConnector:
     ) -> bool:
         query = """
             INSERT INTO violations (
-                user, driver_name, driver_id, rfid_serial,
+                driver_name, driver_id, rfid_serial,
                 violation, vehicle, date, amount, due_date, paid
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         result = self.execute_query(query, (
-            user, driver_name, driver_id, rfid_serial,
+            driver_name, driver_id, rfid_serial,
             violation, vehicle, date, amount, due_date, paid
         ))
         return result is None
@@ -277,15 +287,11 @@ class DatabaseConnector:
     def update_violation(
         self,
         violation_id: int,
-        user: str = None,
         violation: str = None,
         paid: int = None,
         due_date: str = None
     ) -> bool:
         updates, params = [], []
-        if user is not None:
-            updates.append("user=?")
-            params.append(user)
         if violation is not None:
             updates.append("violation=?")
             params.append(violation)
@@ -302,9 +308,9 @@ class DatabaseConnector:
         result = self.execute_query(query, tuple(params))
         return result is None
 
-    def delete_violation(self, violation_id: str) -> bool:
-        query = "DELETE FROM violations WHERE driver_id=?"
-        result = self.execute_query(query, (violation_id,))
+    def delete_violation(self, id: str) -> bool:
+        query = "DELETE FROM violations WHERE id=?"
+        result = self.execute_query(query, (id,))
         return result is None
 
     def get_violation(self, violation_id: int) -> Optional[Dict[str, Any]]:
@@ -320,6 +326,10 @@ class DatabaseConnector:
         query = "SELECT * FROM violations"
         return self.execute_query(query, fetch_all=True)
 
+    def get_all_violation_driver(self, driver_name):
+        query = "SELECT * FROM violations WHERE driver_name = ?"
+        return self.execute_query(query, (driver_name, ), fetch_all=True)
+
     def get_active_violations_by_rfid(self, rfid_serial: str) -> List[Dict[str, Any]]:
         """
         Fetch all active (unpaid) violations for a specific RFID.
@@ -330,7 +340,7 @@ class DatabaseConnector:
                 v.violation, d.vehicle, v.date, v.due_date, v.amount, v.paid
             FROM violations v
             JOIN drivers d ON v.driver_id = d.driver_id
-            WHERE v.paid = 0 AND d.rfid_serial = ?
+            WHERE v.paid = 'unpaid' AND d.rfid_serial = ?
             ORDER BY v.date DESC
         """
         rows = self.execute_query(query, (rfid_serial,), fetch_all=True)
