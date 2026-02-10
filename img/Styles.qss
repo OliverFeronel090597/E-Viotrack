@@ -275,7 +275,7 @@ QLabel#statusVersion {
 /* ============================================================
    QListWidget Scrollbar (Shared)
    ============================================================ */
-QListWidget#rfidTagList {
+QTextEdit#rfidTagList {
     background-color: #f4f5f7;
     border: 1px solid #2980b9;
     border-radius: 6px;

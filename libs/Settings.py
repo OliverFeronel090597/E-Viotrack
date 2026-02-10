@@ -2,11 +2,13 @@ import serial
 import serial.tools.list_ports
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QCheckBox,
-    QListWidget, QHBoxLayout, QComboBox, QLineEdit
+    QTextEdit, QHBoxLayout, QComboBox, QLineEdit
 )
 from PyQt6.QtCore import Qt, QTimer, QThread
+from datetime import datetime
 from libs.DatabaseConnector import DatabaseConnector
 from libs.RFIDWorker import RFIDWorker
+from libs.LineClickTextEdit import LineClickTextEdit
 
 BAUD_RATES = [9600, 19200, 38400, 57600, 115200, 230400]
 
@@ -59,7 +61,7 @@ class RFIDManager(QWidget):
         lbl_tags.setObjectName("tagsLabel")
         layout.addWidget(lbl_tags)
 
-        self.tag_list = QListWidget(parent=self)
+        self.tag_list = LineClickTextEdit(parent=self)
         self.tag_list.setObjectName("rfidTagList")
         layout.addWidget(self.tag_list)
 
@@ -172,24 +174,26 @@ class RFIDManager(QWidget):
 
     # -------------------- QThread control --------------------
     def start_reader(self, port, baud):
-        if port in self.threads:
+        if port in self.workers:  # check workers, not threads
             return
 
+        # Create worker (thread is internal)
         worker = RFIDWorker(port, baud)
-        thread = QThread()
 
-        worker.moveToThread(thread)
-        thread.started.connect(worker.run)
-
+        # Connect signals
+        # worker.tag_signal.connect(lambda p, t: print(p, t))  # optional debug
+        #worker.finished.connect(lambda p: print(p, "finished"))
         worker.tag_signal.connect(self.on_tag_read)
         worker.finished.connect(self.on_worker_finished)
 
         # Store references
-        self.threads[port] = thread
         self.workers[port] = worker
+        self.threads[port] = worker.thread  # optional, if you need reference
 
-        thread.start()
-        print(f"[{port}] QThread started @ {baud}")
+        # Start worker (thread managed internally)
+        worker.start()
+
+        print(f"[{port}] RFIDWorker started @ {baud}")
         self.update_device_counters()
 
 
@@ -232,11 +236,9 @@ class RFIDManager(QWidget):
 
     # -------------------- Tag display --------------------
     def on_tag_read(self, port, tag):
-        self.tag_list.addItem(f"{port} → {tag}")
-        max_lines = self.MAX_TAG_LINES_DEFAULT
-        self.tag_list.scrollToBottom()
-        while self.tag_list.count() > max_lines:
-            self.tag_list.takeItem(0)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.tag_list.append(f"{timestamp} [{port}] -------------> {tag}")
+
         try:
             if hasattr(self.upfdate_rfid, "handle_add_violation") and tag:
                 self.upfdate_rfid.handle_add_violation(tag)

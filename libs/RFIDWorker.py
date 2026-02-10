@@ -1,9 +1,7 @@
-import serial
 import re
-from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import QObject, pyqtSignal, QThread, QIODevice
+from PyQt6.QtSerialPort import QSerialPort
 
-
-# ===================== RFID Worker =====================
 class RFIDWorker(QObject):
     tag_signal = pyqtSignal(str, str)  # port, tag
     finished = pyqtSignal(str)         # port
@@ -13,46 +11,54 @@ class RFIDWorker(QObject):
         self.port = port
         self.baud = baud
         self.running = True
-        self.ser = None
+        self.buffer = bytearray()
+        self.serial = None
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.started.connect(self.run)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+    def start(self):
+        self.thread.start()
+        print(f"[{self.port}] Worker thread started @ {self.baud}")
 
     def stop(self):
         self.running = False
-        if self.ser:
-            try:
-                if self.ser.is_open:
-                    self.ser.close()
-            except Exception as e:
-                print(f"[{self.port}] Serial close failed: {e}")
-            finally:
-                self.ser = None
+        if self.serial and self.serial.isOpen():
+            self.serial.close()
+        self.finished.emit(self.port)
+        self.thread.quit()
+        self.thread.wait()
+        print(f"[{self.port}] Worker stopped")
 
     def run(self):
-        try:
-            self.ser = serial.Serial(self.port, self.baud, timeout=0.3)
-        except Exception as e:
-            print(f"[{self.port}] Cannot open:", e)
+        # create serial port inside this thread context
+        self.serial = QSerialPort()
+        self.serial.setPortName(self.port)
+        self.serial.setBaudRate(self.baud)
+        self.serial.readyRead.connect(self.handle_ready_read)
+
+        if not self.serial.open(QIODevice.OpenModeFlag.ReadWrite):
+            print(f"[{self.port}] Cannot open")
             self.finished.emit(self.port)
             return
 
-        while self.running:
-            try:
-                line = self.ser.readline()
-            except Exception as e:
-                print(f"[{self.port}] Serial error:", e)
-                break
+        print(f"[{self.port}] Serial opened")
 
-            if line:
-                tag = line.decode(errors="ignore").strip()
-                if tag:
-                    tag = self.get_int_signed(tag)  # this returns int
-                    if tag is not None:
-                        self.tag_signal.emit(self.port, str(tag))   # FIX: must be string
-                    else:
-                        self.tag_signal.emit(self.port, "")         # or ignore
+    def handle_ready_read(self):
+        if not self.running:
+            return
 
-        self.stop()
-        self.finished.emit(self.port)
-        print(f"[{self.port}] Worker stopped")
+        data = self.serial.readAll()
+        self.buffer.extend(data)
+
+        while b'\n' in self.buffer:
+            line, sep, remaining = self.buffer.partition(b'\n')
+            self.buffer = remaining
+            tag_str = line.decode(errors='ignore').strip()
+            if tag_str:
+                tag_int = self.get_int_signed(tag_str)
+                self.tag_signal.emit(self.port, str(tag_int) if tag_int is not None else "")
 
     def get_int_signed(self, s: str):
         m = re.search(r"[+-]?\d+", s)
