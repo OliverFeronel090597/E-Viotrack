@@ -5,12 +5,14 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer
 
 from libs.EditUserDialog import EditUserDialog
+from libs.GlobalVariable import is_admin
 
 
 class UserTableWidget(QWidget):
-    def __init__(self, db):
-        super().__init__()
+    def __init__(self, db, parent=None):
+        super().__init__(parent)
         self.db = db
+        self.advance_parent = parent
         layout = QVBoxLayout()
         layout.setSpacing(8)
 
@@ -60,11 +62,17 @@ class UserTableWidget(QWidget):
         self.display_users(filtered)
 
     def add_user(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         dlg = EditUserDialog(self.db, None, self)
         if dlg.exec():
             self.load_users()
 
     def edit_user(self, row, col):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         user_name = self.table.item(row, 1).text()
         user_data = self.db.get_system_user(user_name)
         if user_data:
@@ -73,6 +81,9 @@ class UserTableWidget(QWidget):
                 self.load_users()
 
     def delete_user(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()

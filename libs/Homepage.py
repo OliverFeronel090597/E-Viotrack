@@ -81,7 +81,7 @@ class HomePage(QWidget):
         violations = self.db.get_all_violation_driver(driver_name)
 
         if not violations:
-            self.driver_details.setPlainText("No violations found.")
+            # self.driver_details.setPlainText("No violations found.")
             return
 
         # --- Monospaced font ---

@@ -193,6 +193,10 @@ class E_Viotrack(QMainWindow):
             )
         )
 
+    # -------------------- NOTIFICATION WRAPPER --------------------
+    def show_notification(self, message: str = None, icon: str = None):
+        """Show a notification using the notification manager."""
+        self.notification_manager.show_notification(message, icon_new=icon)
 
     # -------------------- SEPARATOR --------------------
     def create_separator(self, direction="h"):

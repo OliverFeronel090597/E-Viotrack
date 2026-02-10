@@ -148,7 +148,7 @@ class EditViolationDialog(QDialog):
         """
         Auto-fill other fields when a driver is selected
         """
-        drivers = self.db.select_driver(driver_name)  # returns list of tuples
+        drivers = self.db.select_all_driver(driver_name)  # returns list of tuples
 
         driver_dict = None
         for d in drivers:

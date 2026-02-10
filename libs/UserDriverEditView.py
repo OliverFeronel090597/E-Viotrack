@@ -2,7 +2,7 @@ import sys
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QHBoxLayout, QSplitter
 )
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt
 
 # Safe import
 try:
@@ -19,22 +19,19 @@ except ImportError:
 # MAIN WINDOW SIDE BY SIDE
 # ==========================
 class UserDriver(QWidget):
-    def __init__(self, db, parent=None):
+    def __init__(self, db, notification_parent=None, parent=None):
         super().__init__(parent)
         self.db = db
+        self.notification_parent = notification_parent
         self.setWindowTitle("Admin Panel")
         self.resize(1200, 500)
-        self.source_parent = parent
-        QTimer.singleShot(5000, lambda: self.source_parent.notification_manager.show_notification(                
-            "Please Login as Admin To Access this Feature.",
-            icon="SP_MessageBoxWarning"))
 
         # Create a horizontal splitter
         splitter = QSplitter(Qt.Orientation.Horizontal)
         
         # Add tables to the splitter
-        self.user_table = UserTableWidget(db)
-        self.driver_table = DriverTableWidget(db)
+        self.user_table = UserTableWidget(db, self.notification_parent)
+        self.driver_table = DriverTableWidget(db, self.notification_parent)
         splitter.addWidget(self.user_table)
         splitter.addWidget(self.driver_table)
 

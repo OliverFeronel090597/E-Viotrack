@@ -9,12 +9,14 @@ except ImportError:
     from DatabaseConnector import DatabaseConnector
 
 from libs.EditDriverDialog import EditDriverDialog
+from libs.GlobalVariable import is_admin
 
 
 class DriverTableWidget(QWidget):
-    def __init__(self, db: DatabaseConnector):
-        super().__init__()
+    def __init__(self, db: DatabaseConnector, parent=None):
+        super().__init__(parent)
         self.db = db
+        self.advance_parent = parent
         layout = QVBoxLayout()
         layout.setSpacing(8)
 
@@ -66,11 +68,17 @@ class DriverTableWidget(QWidget):
         self.display_drivers(filtered)
 
     def add_driver(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         dlg = EditDriverDialog(self.db, None, self)
         if dlg.exec():
             self.display_drivers()
 
     def edit_driver(self, row, col):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         driver_id = self.table.item(row, 0).text()
         print(driver_id)
         driver_data = self.db.select_driver(driver_id)
@@ -81,6 +89,9 @@ class DriverTableWidget(QWidget):
                 self.display_drivers()
 
     def delete_driver(self):
+        if not is_admin():
+            self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
+            return
         selected = self.table.selectedItems()
         if selected:
             row = selected[0].row()

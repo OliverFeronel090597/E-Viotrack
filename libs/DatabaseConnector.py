@@ -252,7 +252,7 @@ class DatabaseConnector:
         query = "SELECT full_name from DRIVERS"
         return self.execute_query(query, fetch_all=True)
 
-    def select_driver(self, driver):
+    def select_all_driver(self, driver):
         query = "SELECT * from DRIVERS WHERE full_name = ?"
         return self.execute_query(query,(driver,), fetch_all=True) 
 
