@@ -8,11 +8,17 @@ import inspect
 
 class DatabaseConnector:
     def __init__(self):
+        self.is_new_data = False
         """Initialize database connection with proper path handling."""
-        self.base_path = "db"
+        self.base_path = r"C:\ProgramData\E-Viotack"
         self.db_path = os.path.join(self.base_path, "RECORDS.db")
         self._ensure_database_directory()
-        self._create_tables_if_not_exist()
+
+        if self.is_new_data: # This will execute only once Folder and DB well be created
+            print(f"[INFO]  Creating Directory and Database")
+            self._create_tables_if_not_exist()
+            self.add_system_user("Admin Administrator", "admin","admin", "ADMIN")
+        
 
     # ======================
     # DATABASE SETUP METHODS
@@ -24,6 +30,7 @@ class DatabaseConnector:
             try:
                 os.makedirs(self.base_path)
                 print(f"Created database directory at {self.base_path}")
+                self.is_new_data= True
             except PermissionError as e:
                 raise PermissionError(f"Cannot create database directory: {e}")
 
