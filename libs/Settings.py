@@ -205,7 +205,7 @@ class RFIDManager(QWidget):
         if not worker or not thread:
             return
 
-        print(f"[{port}] Stopping reader...")
+        #print(f"[{port}] Stopping reader...")
 
         try:
             worker.stop()
@@ -229,7 +229,7 @@ class RFIDManager(QWidget):
 
     def on_worker_finished(self, port):
         """Worker ended → finish cleanup by stopping thread properly"""
-        print(f"[{port}] Worker finished")
+        #print(f"[{port}] Worker finished")
 
         # Don't delete thread here — call stop_reader (safe path)
         self.stop_reader(port)

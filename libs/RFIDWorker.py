@@ -13,6 +13,8 @@ class RFIDWorker(QObject):
         self.running = True
         self.buffer = bytearray()
         self.serial = None
+
+        # --- thread setup ---
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.started.connect(self.run)
@@ -24,15 +26,18 @@ class RFIDWorker(QObject):
 
     def stop(self):
         self.running = False
+
+        # Do NOT emit finished here, prevents recursion
         if self.serial and self.serial.isOpen():
             self.serial.close()
-        self.finished.emit(self.port)
+
+        # Quit the thread only
         self.thread.quit()
         self.thread.wait()
+
         print(f"[{self.port}] Worker stopped")
 
     def run(self):
-        # create serial port inside this thread context
         self.serial = QSerialPort()
         self.serial.setPortName(self.port)
         self.serial.setBaudRate(self.baud)
@@ -53,9 +58,10 @@ class RFIDWorker(QObject):
         self.buffer.extend(data)
 
         while b'\n' in self.buffer:
-            line, sep, remaining = self.buffer.partition(b'\n')
+            line, _, remaining = self.buffer.partition(b'\n')
             self.buffer = remaining
             tag_str = line.decode(errors='ignore').strip()
+
             if tag_str:
                 tag_int = self.get_int_signed(tag_str)
                 self.tag_signal.emit(self.port, str(tag_int) if tag_int is not None else "")

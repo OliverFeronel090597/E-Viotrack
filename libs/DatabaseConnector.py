@@ -276,8 +276,9 @@ class DatabaseConnector:
             INSERT INTO violations (
                 driver_name, driver_id, rfid_serial,
                 violation, vehicle, date, amount, due_date, paid
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
+
         result = self.execute_query(query, (
             driver_name, driver_id, rfid_serial,
             violation, vehicle, date, amount, due_date, paid
