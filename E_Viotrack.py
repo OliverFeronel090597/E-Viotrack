@@ -47,8 +47,8 @@ class E_Viotrack(QMainWindow):
         self.icon_size = QSize(40, 40)
 
         self.styles = StylesheetModifier(
-            #":/resources/Styles.qss",
-            r"img\\Styles.qss",
+            ":/resources/Styles.qss",
+            #r"img\\Styles.qss",
             self
         )
         # print(QFile(":/resources/Styles.qss").exists())

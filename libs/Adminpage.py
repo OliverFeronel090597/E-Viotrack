@@ -21,6 +21,10 @@ class AdminPage(QWidget):
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
 
+        # Instantiate UserDriver only after login
+        if not hasattr(self, "user_edit"):
+            self.user_edit = UserDriver(self.db, self.parent())
+
         # Only create login UI initially
         if not getattr(GlobalVariable, "user_login_type", None):
             self.initLoginUI()
