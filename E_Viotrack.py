@@ -393,7 +393,7 @@ class E_Viotrack(QMainWindow):
 # -------------------- RUN --------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationVersion("1.2.0")
+    app.setApplicationVersion("2.0.0")
     app.setApplicationName("E-Viotrack")
     event_filter = GlobalActivityLogger()
     app.installEventFilter(event_filter)
