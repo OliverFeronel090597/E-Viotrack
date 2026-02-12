@@ -381,11 +381,12 @@ class E_Viotrack(QMainWindow):
         right_spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         # Add to status bar
-        status.addWidget(self.login_type)      # LEFT
-        status.addWidget(left_spacer)          # left spacer
-        status.addWidget(self.connected_device)    # CENTER
-        status.addWidget(right_spacer)         # right spacer
+        status.addWidget(self.login_type)               # LEFT
+        status.addWidget(left_spacer)                   # left spacer
+        status.addWidget(self.connected_device)         # CENTER
+        status.addWidget(right_spacer)                  # right spacer
         status.addPermanentWidget(self.app_name_label)  # RIGHT
+        # USER: USER USER TYPE         | CONNECTED DEVICE |  APP NANE
 
         # Set status bar
         self.setStatusBar(status)

@@ -28,7 +28,7 @@ class HomePage(QWidget):
         top_row.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.main_layout.addLayout(top_row)
 
-        self.logo_label = AutoImageLabel(r"img/E-VioTrack.png", circle=True, size=(200, 200))
+        self.logo_label = AutoImageLabel(r":/resources/E-VioTrack.png", circle=True, size=(200, 200))
         top_row.addWidget(self.logo_label, alignment=Qt.AlignmentFlag.AlignTop)
 
         self.quote_card = QFrame()

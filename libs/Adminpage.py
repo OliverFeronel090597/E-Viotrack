@@ -89,10 +89,10 @@ class AdminPage(QWidget):
     def togglePassword(self, checked: bool):
         if checked:
             self.pass_input.setEchoMode(QLineEdit.EchoMode.Normal)
-            self.show_hide.setIcon(QIcon("img\\Show.png"))
+            self.show_hide.setIcon(QIcon(":/resources/Show.png"))
         else:
             self.pass_input.setEchoMode(QLineEdit.EchoMode.Password)
-            self.show_hide.setIcon(QIcon("img\\Hide.png"))
+            self.show_hide.setIcon(QIcon(":/resources/Hide.png"))
 
     # =====================
     # LOGIN AUTHENTICATION
