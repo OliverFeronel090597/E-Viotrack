@@ -72,7 +72,7 @@ class DatabaseConnector:
             "date TEXT NOT NULL",
             "amount REAL NOT NULL",
             "due_date TEXT NOT NULL",
-            "paid INTEGER NOT NULL DEFAULT 0"  # BOOL replaced with INTEGER
+            "paid TEXT NOT NULL DEFAULT 0"  # BOOL replaced with INTEGER
         ],
         "violations_type": [
             "id INTEGER PRIMARY KEY AUTOINCREMENT",
