@@ -6,12 +6,14 @@ from PyQt6.QtCore import Qt, QTimer
 
 from libs.EditUserDialog import EditUserDialog
 from libs.GlobalVariable import is_admin
-
+from libs.DatabaseConnector import DatabaseConnector
+from libs import GlobalVariable
 
 class UserTableWidget(QWidget):
-    def __init__(self, db, parent=None):
+    def __init__(self, db: DatabaseConnector,  parent=None):
         super().__init__(parent)
         self.db = db
+        
         self.advance_parent = parent
         layout = QVBoxLayout()
         layout.setSpacing(8)
@@ -89,11 +91,12 @@ class UserTableWidget(QWidget):
             row = selected[0].row()
             user_name = self.table.item(row, 1).text()
             user_id = self.table.item(row, 2).text()
-            print(f"Username {user_name}")
+            #print(f"Username {user_name}")
             confirm = QMessageBox.question(self, "Delete?", f"Delete user {user_name.upper()} Type {user_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 self.db.delete_system_user(user_name)
+                print(f"${GlobalVariable.user_login} Delete user {user_name}")
                 self.load_users()
 
     def show_context_menu(self, pos):

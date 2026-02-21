@@ -32,14 +32,14 @@ class RFIDReaderThread(threading.Thread):
                         if epc and self.callback:
                             self.callback(self.port, epc)
                 except serial.SerialException as e:
-                    print(f"[{self.port}] Serial error:", e)
+                    #print(f"[{self.port}] Serial error:", e)
                     break
         except Exception as e:
-            print(f"[{self.port}] Could not open port:", e)
+            #print(f"[{self.port}] Could not open port:", e)
         finally:
             if self.ser and self.ser.is_open:
                 self.ser.close()
-            print(f"[{self.port}] Reader stopped")
+            #print(f"[{self.port}] Reader stopped")
 
     def stop(self):
         self.running = False
@@ -107,7 +107,7 @@ class RFIDManager(QWidget):
             cb.stateChanged.connect(self.on_port_checkbox_changed)
             self.port_layout.addWidget(cb)
             self.checkboxes[port] = cb
-            print(f"[{port}] Detected new port")
+            #print(f"[{port}] Detected new port")
 
             # Auto-check if previously saved
             if port in self.saved_ports:
@@ -115,7 +115,7 @@ class RFIDManager(QWidget):
 
         # Remove disconnected ports
         for port in self.current_ports - available_ports:
-            print(f"[{port}] Removed port")
+            #print(f"[{port}] Removed port")
             cb = self.checkboxes.pop(port, None)
             if cb:
                 self.port_layout.removeWidget(cb)
@@ -144,7 +144,7 @@ class RFIDManager(QWidget):
         thread = RFIDReaderThread(port, callback=lambda p, epc: self.signals.tag_read.emit(p, epc))
         thread.start()
         self.threads[port] = thread
-        print(f"[{port}] Reader started")
+        #print(f"[{port}] Reader started")
         self.saved_ports.add(port)
         self.save_ports()
 
@@ -154,7 +154,7 @@ class RFIDManager(QWidget):
         if thread:
             thread.stop()
             thread.join()
-            print(f"[{port}] Reader stopped")
+            #print(f"[{port}] Reader stopped")
 
     # -------------------- Tag read --------------------
     def on_tag_read(self, port, epc):

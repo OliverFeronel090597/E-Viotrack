@@ -9,6 +9,7 @@ except ImportError:
     from DatabaseConnector import DatabaseConnector
 
 from libs.EditDriverDialog import EditDriverDialog
+from libs import GlobalVariable
 from libs.GlobalVariable import is_admin
 
 
@@ -80,7 +81,7 @@ class DriverTableWidget(QWidget):
             self.advance_parent.show_notification("Please Login as Admin To Access this Feature.", icon="SP_MessageBoxWarning")
             return
         driver_id = self.table.item(row, 0).text()
-        print(driver_id)
+        #print(driver_id)
         driver_data = self.db.select_driver(driver_id)
         if driver_data:
             dlg = EditDriverDialog(self.db, {"driver_id": driver_data[0], "rfid_serial": driver_data[1],
@@ -100,8 +101,9 @@ class DriverTableWidget(QWidget):
             confirm = QMessageBox.question(self, "Delete?", f"Delete driver {driver_name} ID {driver_id}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
-                print(driver_id)
+                #print(driver_id)
                 self.db.delete_driver(driver_id)
+                print(f"${GlobalVariable.user_login} Delete driver {driver_name}")
                 self.display_drivers()
 
     def show_context_menu(self, pos):

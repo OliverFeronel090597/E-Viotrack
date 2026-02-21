@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
 from libs.UniqueID import generate_unique_id
 try:
     from libs.AutoCapital import AutoCapLineEdit
+    from libs import GlobalVariable
 except ImportError:
     from AutoCapital import AutoCapLineEdit
 
@@ -60,6 +61,8 @@ class EditDriverDialog(QDialog):
             return
         if self.driver_data:
             self.db.update_driver(driver_id, rfid_serial=rfid, full_name=name, vehicle=vehicle)
+            print(f"${GlobalVariable.user_login} Update driver {name}")
         else:
             self.db.add_driver(driver_id, rfid, name, vehicle)
+            print(f"${GlobalVariable.user_login} Added driver {name}")
         self.accept()

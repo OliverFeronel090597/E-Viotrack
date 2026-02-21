@@ -17,13 +17,8 @@ class AdminPage(QWidget):
         super().__init__(parent)
         self.db = db
         self.login_type = login_type
-
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
-
-        # Instantiate UserDriver only after login
-        if not hasattr(self, "user_edit"):
-            self.user_edit = UserDriver(self.db, self.parent())
 
         # Only create login UI initially
         if not getattr(GlobalVariable, "user_login_type", None):
@@ -57,7 +52,7 @@ class AdminPage(QWidget):
         self.pass_input.setFixedWidth(160)
 
         self.show_hide = QPushButton()
-        self.show_hide.setIcon(QIcon("img\\Hide.png"))
+        self.show_hide.setIcon(QIcon(":/resources/Hide.png"))
         self.show_hide.setObjectName("showhide")
         self.show_hide.setCheckable(True)
         self.show_hide.toggled.connect(self.togglePassword)
@@ -100,6 +95,7 @@ class AdminPage(QWidget):
     def attemptLogin(self):
         username = self.user_input.text().strip()
         password = self.pass_input.text().strip()
+        GlobalVariable.user_login = username
 
         if not username:
             self.login_error.setText("Username required")
@@ -115,9 +111,11 @@ class AdminPage(QWidget):
             GlobalVariable.user_login_type = user_type['user_type']
             self.clearLoginUI()
             self.showContent()
+            print(f"${username} Login Successfully")
         else:
             self.pass_input.clear()
             self.login_error.setText("Invalid username or password")
+            print(f"${username} Login Attemp")
 
     # =====================
     # CLEAR LOGIN UI
@@ -167,7 +165,9 @@ class AdminPage(QWidget):
     # =====================
     def logout(self):
         # Clear login type
+        print(f"$User {GlobalVariable.user_login} logout")
         GlobalVariable.user_login_type = None
+
         self.login_type.setText("USER:")
 
         # Remove user table and logout button

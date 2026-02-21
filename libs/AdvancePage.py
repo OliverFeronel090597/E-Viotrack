@@ -1,34 +1,31 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QSplitter
+    QApplication, QWidget, QHBoxLayout, QSplitter
 )
 from PyQt6.QtCore import Qt
 
-try:
-    from libs.DatabaseConnector import DatabaseConnector
-    from libs.EditViolationTypeDialog import EditViolationTypeDialog
-    from libs.EditViolationDialog import EditViolationDialog
-    from libs.ViolationTypeTableWidget import ViolationTypeTableWidget
-    from libs.ViolationTableWidget import ViolationTableWidget
-    from libs.GlobalVariable import is_admin
-except ImportError:
-    from DatabaseConnector import DatabaseConnector
+
+from libs.DatabaseConnector import DatabaseConnector
+from libs.ViolationTypeTableWidget import ViolationTypeTableWidget
+from libs.ViolationTableWidget import ViolationTableWidget
+from libs.Homepage import HomePage
 
 
 # ==========================
 # MAIN WINDOW
 # ==========================
 class AdvancePage(QWidget):
-    def __init__(self, db: DatabaseConnector, parent=None):
+    def __init__(self, db: DatabaseConnector, home_update:HomePage, parent=None):
         super().__init__(parent)
         self.db = db
         self.source_parent = parent
+        self.home_update = home_update
 
         # Use a horizontal splitter instead of a simple layout
         splitter = QSplitter(Qt.Orientation.Horizontal)
         
         # Add widgets to splitter
-        self.violation_table = ViolationTableWidget(db, parent=self)
+        self.violation_table = ViolationTableWidget(db, self.home_update, parent=self)
         self.violation_type_table = ViolationTypeTableWidget(db, parent=self)
         splitter.addWidget(self.violation_table)
         splitter.addWidget(self.violation_type_table)

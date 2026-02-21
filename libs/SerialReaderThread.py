@@ -34,7 +34,7 @@ class SerialReaderThread(QThread):
                 self.error_occurred.emit(f"Serial error on {self.port_name}: {e}")
                 break
             except Exception as e:
-                print(f"Unknown error: {e}")
+                #print(f"Unknown error: {e}")
 
         if self.ser and self.ser.is_open:
             self.ser.close()

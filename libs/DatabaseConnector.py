@@ -15,7 +15,7 @@ class DatabaseConnector:
         self._ensure_database_directory()
 
         if self.is_new_data: # This will execute only once Folder and DB well be created
-            print(f"[INFO]  Creating Directory and Database")
+            #print(f"[INFO]  Creating Directory and Database")
             self._create_tables_if_not_exist()
             self.add_system_user("Admin Administrator", "admin","admin", "ADMIN")
         
@@ -29,7 +29,7 @@ class DatabaseConnector:
         if not os.path.exists(self.base_path):
             try:
                 os.makedirs(self.base_path)
-                print(f"Created database directory at {self.base_path}")
+                #print(f"Created database directory at {self.base_path}")
                 self.is_new_data= True
             except PermissionError as e:
                 raise PermissionError(f"Cannot create database directory: {e}")
@@ -41,7 +41,7 @@ class DatabaseConnector:
             conn.execute("PRAGMA foreign_keys = ON")
             return conn
         except sqlite3.Error as e:
-            print(f"Database connection error: {e}")
+            #print(f"Database connection error: {e}")
             return None
 
     def _create_tables_if_not_exist(self) -> None:
@@ -105,7 +105,7 @@ class DatabaseConnector:
         frame = inspect.stack()[1].frame
         cls = frame.f_locals.get('self').__class__.__name__ if 'self' in frame.f_locals else None
         func = inspect.stack()[1].function
-        #print(f"Called by: {cls}.{func}" if cls else f"Called by: {func}")
+        ##print(f"Called by: {cls}.{func}" if cls else f"Called by: {func}")
         
         with self.connect() as conn:
             if conn is None:
@@ -120,7 +120,7 @@ class DatabaseConnector:
                 conn.commit()
                 return None
             except sqlite3.Error as e:
-                print(f"Query execution error: {e}")
+                #print(f"Query execution error: {e}")
                 return None
 
     def _execute(self, query: str):
@@ -352,6 +352,27 @@ class DatabaseConnector:
             ORDER BY v.date DESC
         """
         rows = self.execute_query(query, (rfid_serial,), fetch_all=True)
+        if not rows:
+            return []
+
+        keys = ["driver_name", "driver_id", "rfid_serial",
+                "violation", "vehicle", "date", "due_date", "amount", "paid"]
+        return [dict(zip(keys, row)) for row in rows]
+
+    def get_active_violations_by_username(self, username: str) -> list[dict]:
+        """
+        Fetch all active (unpaid) violations for a specific driver by username.
+        Returns a list of dicts suitable for ViolationTree.
+        """
+        query = """
+            SELECT d.full_name, d.driver_id, d.rfid_serial,
+                v.violation, d.vehicle, v.date, v.due_date, v.amount, v.paid
+            FROM violations v
+            JOIN drivers d ON v.driver_id = d.driver_id
+            WHERE v.paid = 'unpaid' AND d.full_name = ?
+            ORDER BY v.date DESC
+        """
+        rows = self.execute_query(query, (username,), fetch_all=True)
         if not rows:
             return []
 

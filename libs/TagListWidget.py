@@ -14,7 +14,7 @@ class TagListWidget(QListWidget):
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self._is_manual_scroll != self._is_manual_scroll
-            print(f"_is_manual_scroll {self._is_manual_scroll}")
+            #print(f"_is_manual_scroll {self._is_manual_scroll}")
             return
         super().mousePressEvent(event)
 
@@ -27,13 +27,13 @@ class TagListWidget(QListWidget):
             digits = "".join(re.findall(r"\d+", text))
 
             QApplication.clipboard().setText(digits)
-            print(f"Copied digits: {digits}")
+            #print(f"Copied digits: {digits}")
 
         super().mouseDoubleClickEvent(event)
 
     # ---------------- BLOCK MOTHER scrollToBottom() ----------------
     def scrollToBottom(self):
-        print("Scroll")
+        #print("Scroll")
         if self._is_manual_scroll:
             return
         super().scrollToBottom()

@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
 from datetime import datetime
 from libs.DatabaseConnector import DatabaseConnector
 from libs.CompleterLineEdit import CompleterLineEdit
+from libs import GlobalVariable
 
 class EditViolationDialog(QDialog):
     def __init__(self, db: DatabaseConnector, violation=None, parent=None):
@@ -128,6 +129,7 @@ class EditViolationDialog(QDialog):
                 paid='unpaid',
                 due_date=due_date
             )
+            print(f"${GlobalVariable.user_login} Update violation {violation} of {driver_name}")
         else:
             # add
             self.db.add_violation(
@@ -141,6 +143,7 @@ class EditViolationDialog(QDialog):
                 due_date=due_date,
                 paid="unpaid"
             )
+            print(f"${GlobalVariable.user_login} Add violation {violation} of {driver_name}")
         self.accept()
 
     # -------------------------------

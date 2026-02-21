@@ -110,3 +110,55 @@ class ViolationTree(QTreeView):
             driver_name = self.tree_model.itemFromIndex(index).text()
             # Emit the signal
             self.driver_clicked.emit(driver_name)
+
+    def update_driver_violations(self, driver_name: str, violations: list[dict]):
+        """Refresh the violations for a driver, remove duplicates, and remove driver node if no violations."""
+        if not driver_name:
+            print("[WARN] update_driver_violations(): No driver name.")
+            return
+
+        # Locate driver node
+        parent_item = None
+        for row in range(self.tree_model.rowCount()):
+            item = self.tree_model.item(row)
+            if item.text() == driver_name:
+                parent_item = item
+                break
+
+        # If there are no violations, remove the driver node if it exists
+        if not violations:
+            if parent_item:
+                self.tree_model.removeRow(parent_item.row())
+                print(f"[INFO] Removed driver '{driver_name}' (no active violations)")
+            else:
+                print(f"[INFO] No violations to add for '{driver_name}'")
+            return
+
+        # Create driver node if it doesn't exist
+        if not parent_item:
+            parent_item = QStandardItem(driver_name)
+            parent_item.setEditable(False)
+            self.tree_model.appendRow(parent_item)
+
+        # Clear old violations
+        parent_item.removeRows(0, parent_item.rowCount())
+
+        # Add new violations
+        for v in violations:
+            child_data = (
+                str(v.get("driver_id", "")),
+                str(v.get("rfid_serial", "")),
+                str(v.get("violation", "")),
+                str(v.get("vehicle", "")),
+                str(v.get("amount", "")),
+                str(v.get("date", "")),
+                str(v.get("due_date", "")),
+                str(v.get("paid", ""))
+            )
+            child_items = [QStandardItem("")] + [QStandardItem(x) for x in child_data]
+            for c in child_items:
+                c.setEditable(False)
+            parent_item.appendRow(child_items)
+
+        self.expandAll()
+        print(f"[INFO] Updated violations for driver: {driver_name}")

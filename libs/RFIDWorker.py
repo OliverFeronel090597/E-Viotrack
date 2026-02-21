@@ -22,7 +22,7 @@ class RFIDWorker(QObject):
 
     def start(self):
         self.thread.start()
-        print(f"[{self.port}] Worker thread started @ {self.baud}")
+        #print(f"[{self.port}] Worker thread started @ {self.baud}")
 
     def stop(self):
         self.running = False
@@ -35,7 +35,7 @@ class RFIDWorker(QObject):
         self.thread.quit()
         self.thread.wait()
 
-        print(f"[{self.port}] Worker stopped")
+        #print(f"[{self.port}] Worker stopped")
 
     def run(self):
         self.serial = QSerialPort()
@@ -44,11 +44,11 @@ class RFIDWorker(QObject):
         self.serial.readyRead.connect(self.handle_ready_read)
 
         if not self.serial.open(QIODevice.OpenModeFlag.ReadWrite):
-            print(f"[{self.port}] Cannot open")
+            #print(f"[{self.port}] Cannot open")
             self.finished.emit(self.port)
             return
 
-        print(f"[{self.port}] Serial opened")
+        #print(f"[{self.port}] Serial opened")
 
     def handle_ready_read(self):
         if not self.running:

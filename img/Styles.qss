@@ -338,6 +338,7 @@ QPlainTextEdit#LogView {
     background-color: #ffffff;
     border: 1px solid #2980b9;
     border-radius: 6px;
+    font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
     font-size: 13px;
     color: #222222;
     padding: 6px;

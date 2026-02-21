@@ -1,51 +1,38 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout
-from PyQt6.QtCore import Qt, QTimer, QTime
-from PyQt6.QtGui import QFontDatabase, QFont
+from PyQt6.QtWidgets import  QStackedWidget
 
-class SevenSegmentClock(QWidget):
-    def __init__(self):
+from PyQt6.QtCore import QPropertyAnimation, QEasingCurve
+
+# -------------------- ANIMATED STACK --------------------
+class AnimatedStack(QStackedWidget):
+    def __init__(self, duration=250):
         super().__init__()
-        self.setWindowTitle("7-Segment Clock")
+        self.duration = duration
+        self._anim_out = None
+        self._anim_in = None
 
-        # Load 7-segment TTF font (place the font file in 'fonts/' folder)
-        font_id = QFontDatabase.addApplicationFont("fonts/Digital-7.ttf")
-        if font_id == -1:
-            print("Failed to load 7-segment font.")
-            sys.exit(1)
-        family = QFontDatabase.applicationFontFamilies(font_id)[0]
+    def slide_to(self, index: int):
+        if index == self.currentIndex():
+            return
 
-        # Create label for clock
-        self.label = QLabel()
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        direction = 1 if index > self.currentIndex() else -1
 
-        # Apply 7-segment font with spacing
-        font = QFont(family, 60)  # font size
-        font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 10)  # spacing between digits
-        self.label.setFont(font)
+        current = self.currentWidget()
+        target = self.widget(index)
 
-        # Layout
-        layout = QHBoxLayout()
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+        target.setGeometry(current.geometry().translated(direction * self.width(), 0))
+        self.setCurrentWidget(target)
 
-        # Timer updates every second
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_time)
-        self.timer.start(1000)
+        anim_out = QPropertyAnimation(current, b"geometry")
+        anim_out.setDuration(self.duration)
+        anim_out.setEndValue(current.geometry().translated(-direction * self.width(), 0))
 
-        self.update_time()
+        anim_in = QPropertyAnimation(target, b"geometry")
+        anim_in.setDuration(self.duration)
+        anim_in.setEndValue(current.geometry())
 
-    def update_time(self):
-        now = QTime.currentTime()
-        # Insert spaces around colons for extra spacing
-        time_str = now.toString("hh : mm : ss")
-        self.label.setText(time_str)
+        for anim in (anim_in, anim_out):
+            anim.setEasingCurve(QEasingCurve.Type.InOutQuad)
+            anim.start()
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    clock = SevenSegmentClock()
-    clock.resize(600, 150)
-    clock.show()
-    sys.exit(app.exec())
+        self._anim_out = anim_out
+        self._anim_in = anim_in

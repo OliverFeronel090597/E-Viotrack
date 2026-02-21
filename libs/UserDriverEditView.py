@@ -22,6 +22,7 @@ class UserDriver(QWidget):
     def __init__(self, db, notification_parent=None, parent=None):
         super().__init__(parent)
         self.db = db
+
         self.notification_parent = notification_parent
         self.setWindowTitle("Admin Panel")
         self.resize(1200, 500)
@@ -39,7 +40,7 @@ class UserDriver(QWidget):
         splitter.setSizes([700, 500])
 
         # Prevent collapsing completely
-        splitter.setChildrenCollapsible(False)
+        splitter.setChildrenCollapsible(True)
 
         # Use a layout to hold the splitter
         layout = QHBoxLayout()

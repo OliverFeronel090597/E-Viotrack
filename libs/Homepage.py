@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QTextEdit, QFrame, QTableWidget, QTableWidgetItem
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QCursor
 from libs.DatabaseConnector import DatabaseConnector
 from libs.Imagelabel import AutoImageLabel
@@ -21,6 +21,11 @@ class HomePage(QWidget):
 
         self.init_top_row()
         self.init_violation_tree()
+
+        # self.timer = QTimer()
+        # self.timer.setInterval(5000)  # refresh every 5 seconds
+        # self.timer.timeout.connect(self.update_driver_data)
+        # self.timer.start()
 
     def init_top_row(self):
         top_row = QHBoxLayout()
@@ -60,12 +65,12 @@ class HomePage(QWidget):
         self.violation_tree = ViolationTree()
         self.violation_layout.addWidget(self.violation_tree)
 
-        self.delete_btn = QPushButton("Delete Selected Violation")
-        self.delete_btn.setObjectName("DeleteViolationBtn")
-        self.delete_btn.clicked.connect(self.violation_tree.remove_selected_violation)
-        self.delete_btn.hide()
-        print("[INFO] Delete button hidden from Homepage class as it may be used in the future")
-        self.violation_layout.addWidget(self.delete_btn)
+        # self.delete_btn = QPushButton("Test")
+        # self.delete_btn.setObjectName("DeleteViolationBtn")
+        # self.delete_btn.clicked.connect(lambda: self.update_driver_data("Sarah Miller"))
+        # #self.delete_btn.hide()
+        # print("[INFO] Delete button hidden from Homepage class as it may be used in the future")
+        # self.violation_layout.addWidget(self.delete_btn)
 
         self.violation_tree.driver_clicked.connect(self.on_driver_clicked)
 
@@ -79,6 +84,8 @@ class HomePage(QWidget):
         self.driver_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.driver_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.violation_layout.addWidget(self.driver_table)
+
+
 
     def handle_add_violation(self, rfid=None):
         if not rfid:
@@ -118,3 +125,12 @@ class HomePage(QWidget):
 
         self.driver_table.resizeColumnsToContents()
         self.driver_table.resizeRowsToContents()
+
+    def update_driver_data(self, driver_name: str = "Chris Wilson"):
+        if not driver_name:
+            print("$[WARN] No driver selected for update")
+            return
+
+        active_violations = self.db.get_active_violations_by_username(driver_name)
+        self.violation_tree.update_driver_violations(driver_name, active_violations)
+        print(f"$[INFO] Updated violations for {driver_name}")

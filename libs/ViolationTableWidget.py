@@ -7,12 +7,15 @@ from libs.DatabaseConnector import DatabaseConnector
 from libs.TablePrint import print_table
 from libs.GlobalVariable import is_admin
 from libs.EditViolationDialog import EditViolationDialog
+from libs.Homepage import HomePage
+from libs import GlobalVariable
 
 
 class ViolationTableWidget(QWidget):
-    def __init__(self, db: DatabaseConnector, parent=None):
+    def __init__(self, db: DatabaseConnector, home_update:HomePage, parent=None):
         super().__init__(parent)
         self.db = db
+        self.home_page = home_update
         self.advance_parent: QApplication = parent
         layout = QVBoxLayout()
         top_layout = QHBoxLayout()
@@ -119,6 +122,7 @@ class ViolationTableWidget(QWidget):
             if confirm == QMessageBox.StandardButton.Yes:
                 self.db.delete_violation(id)
                 self.load_violations()
+                print(f"${GlobalVariable.user_login} Delete violation {violator_name} ID {violation_id}")
 
 
     def paid_violation(self):
@@ -155,6 +159,8 @@ class ViolationTableWidget(QWidget):
             # Updated DatabaseConnector method accepts date as filter
             self.db.paid_violation(violator_id, violator_name, violation_date)
             self.load_violations()
+            self.home_page.update_driver_data(violator_name)
+            print(f"${GlobalVariable.user_login} Violation paid {violator_name} ID {violator_id}")
 
 
     def show_context_menu(self, pos):

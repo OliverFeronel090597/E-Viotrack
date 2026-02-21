@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
 )
 from libs.AutoCapital import AutoCapLineEdit
 from libs.DatabaseConnector import DatabaseConnector
-
+from libs import GlobalVariable
 
 class EditViolationTypeDialog(QDialog):
     def __init__(self, db: DatabaseConnector, vtype_data=None, parent=None):
@@ -47,6 +47,9 @@ class EditViolationTypeDialog(QDialog):
 
         if self.vtype_data:
             self.db.update_violation_type(self.vtype_data["id"], violation_type=vtype, amount=amount)
+            print(f"${GlobalVariable.user_login} Update violation {vtype} amount {amount}")
         else:
             self.db.add_violation_type(vtype, amount)
+            print(f"${GlobalVariable.user_login} Add violation {vtype} amount {amount}")
+            
         self.accept()

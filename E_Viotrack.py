@@ -16,7 +16,6 @@ from libs.Settings              import RFIDManager
 from libs.Adminpage             import AdminPage
 from libs.AdvancePage           import AdvancePage
 from libs.DatabaseConnector     import DatabaseConnector
-from libs.Globalenentfilter     import GlobalActivityLogger
 from libs.About                 import AboutDialog
 from libs.NotificationManager   import NotificationManager
 from libs.resources             import * # QRCC 
@@ -36,6 +35,7 @@ class E_Viotrack(QMainWindow):
 
         self.db = DatabaseConnector()
         self.about = AboutDialog(self)
+        self.log_page= None
 
         # NAV STATE
         self.nav_expanded = True
@@ -48,10 +48,10 @@ class E_Viotrack(QMainWindow):
 
         self.styles = StylesheetModifier(
             ":/resources/Styles.qss",
-            #r"img\\Styles.qss",
+            #"img\\Styles.qss",
             self
         )
-        # print(QFile(":/resources/Styles.qss").exists())
+        # #print(QFile(":/resources/Styles.qss").exists())
 
         # ICON LOADER
         def load_icon(path, size):
@@ -128,11 +128,11 @@ class E_Viotrack(QMainWindow):
         nav_layout.addLayout(toggle_row)
 
         # NAV BUTTONS
-        self.btn_home = QPushButton()
-        self.btn_admin = QPushButton()
-        self.btn_logs = QPushButton()
-        self.btn_advance = QPushButton()
-        self.btn_settings = QPushButton()
+        self.btn_home       = QPushButton()
+        self.btn_admin      = QPushButton()
+        self.btn_logs       = QPushButton()
+        self.btn_advance    = QPushButton()
+        self.btn_settings   = QPushButton()
 
         # Setup
         self.setup_nav_button(self.btn_home, self.logo_home, "Home")
@@ -161,11 +161,11 @@ class E_Viotrack(QMainWindow):
         self.nav_buttons = [self.btn_home, self.btn_admin, self.btn_logs, self.btn_advance, self.btn_settings]
 
         # WIDGETS
-        self.home_page = HomePage(self.db)
-        self.admin_page = AdminPage(self.db, self.login_type, self)
-        self.log_page = LogPage()
-        self.advance_page = AdvancePage(self.db, self)
-        self.settings_page = RFIDManager(self.home_page, self.db, self.connected_device)
+        self.home_page          =    HomePage(self.db)
+        self.admin_page         =    AdminPage(self.db, self.login_type, self)
+        self.log_page           =    LogPage() 
+        self.advance_page       =    AdvancePage(self.db, self.home_page, self)
+        self.settings_page      =    RFIDManager(self.home_page, self.db, self.connected_device)
 
         # STACK
         self.stack = AnimatedStack(duration=self.anim_duration)
@@ -394,14 +394,14 @@ class E_Viotrack(QMainWindow):
 # -------------------- RUN --------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationVersion("2.0.0")
+    app.setApplicationVersion("2.1.0")
     app.setApplicationName("E-Viotrack")
-    event_filter = GlobalActivityLogger()
-    app.installEventFilter(event_filter)
+    # event_filter = GlobalActivityLogger()
+    # app.installEventFilter(event_filter)
     window = E_Viotrack()
     window.show()
 
-    logger = GlobalActivityLogger(log_callback=window.log_page.add_log, throttle_seconds=1)
-    app.installEventFilter(logger)
+    # logger = GlobalActivityLogger(log_callback=window.log_page.add_log, throttle_seconds=1)
+    # app.installEventFilter(logger)
 
     sys.exit(app.exec())

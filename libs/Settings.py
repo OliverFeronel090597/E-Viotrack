@@ -87,7 +87,7 @@ class RFIDManager(QWidget):
 
         available = {p.device for p in valid_ports}
         if len(available) != self.prev_comport_len:
-            print("Available USB-Serial ports:", available)
+            #print("Available USB-Serial ports:", available)
             self.prev_comport_len = len(available)
 
         # Add new ports
@@ -124,7 +124,7 @@ class RFIDManager(QWidget):
         row.addWidget(combo)
 
         self.port_container.addWidget(widget)
-        print(f"[{port}] Detected")
+        #print(f"[{port}] Detected")
 
         # Load DB
         db_port = self.db.get_comport(port)
@@ -134,7 +134,7 @@ class RFIDManager(QWidget):
             combo.setDisabled(True)  # disable when connected
 
     def remove_port_widget(self, port):
-        print(f"[{port}] Removed")
+        #print(f"[{port}] Removed")
         cb : QCheckBox = self.checkboxes.pop(port, None)
         combo : QComboBox = self.combos.pop(port, None)
         if cb:
@@ -181,8 +181,8 @@ class RFIDManager(QWidget):
         worker = RFIDWorker(port, baud)
 
         # Connect signals
-        # worker.tag_signal.connect(lambda p, t: print(p, t))  # optional debug
-        #worker.finished.connect(lambda p: print(p, "finished"))
+        # worker.tag_signal.connect(lambda p, t: #print(p, t))  # optional debug
+        #worker.finished.connect(lambda p: #print(p, "finished"))
         worker.tag_signal.connect(self.on_tag_read)
         worker.finished.connect(self.on_worker_finished)
 
@@ -193,7 +193,7 @@ class RFIDManager(QWidget):
         # Start worker (thread managed internally)
         worker.start()
 
-        print(f"[{port}] RFIDWorker started @ {baud}")
+        #print(f"[{port}] RFIDWorker started @ {baud}")
         self.update_device_counters()
 
 
@@ -205,7 +205,7 @@ class RFIDManager(QWidget):
         if not worker or not thread:
             return
 
-        #print(f"[{port}] Stopping reader...")
+        ##print(f"[{port}] Stopping reader...")
 
         try:
             worker.stop()
@@ -218,7 +218,7 @@ class RFIDManager(QWidget):
         # WAIT UNTIL IT FULLY STOPS  (no timeout)
         thread.wait()
 
-        print(f"[{port}] Thread fully stopped")
+        #print(f"[{port}] Thread fully stopped")
 
         # Now safe to delete references
         self.workers.pop(port, None)
@@ -229,7 +229,7 @@ class RFIDManager(QWidget):
 
     def on_worker_finished(self, port):
         """Worker ended → finish cleanup by stopping thread properly"""
-        #print(f"[{port}] Worker finished")
+        ##print(f"[{port}] Worker finished")
 
         # Don't delete thread here — call stop_reader (safe path)
         self.stop_reader(port)
@@ -243,7 +243,8 @@ class RFIDManager(QWidget):
             if hasattr(self.upfdate_rfid, "handle_add_violation") and tag:
                 self.upfdate_rfid.handle_add_violation(tag)
         except Exception as e:
-            print("RFID process error:", e)
+            pass
+            #print("RFID process error:", e)
 
     def update_device_counters(self):
         running = 0

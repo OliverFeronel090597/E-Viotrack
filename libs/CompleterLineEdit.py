@@ -44,7 +44,7 @@ class CompleterLineEdit(QLineEdit):
         self.completer.setPopup(popup)
         self.setCompleter(self.completer)
 
-        # Connect selection to print
+        # Connect selection to #print
         self.completer.activated.connect(self._on_completer_selected)
 
     def _flatten_to_strings(self, data):
@@ -63,7 +63,7 @@ class CompleterLineEdit(QLineEdit):
 
     def _on_completer_selected(self, driver):
         """Print the selected item"""
-        print(f"Selected: {driver}")
+        ##print(f"Selected: {driver}")
         self.selected_driver.emit(driver)
 
     # # Optional: clear if focus lost and text is not in suggestions

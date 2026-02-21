@@ -7,6 +7,7 @@ from libs.DatabaseConnector import DatabaseConnector
 from libs.TablePrint import print_table
 from libs.GlobalVariable import is_admin
 from libs.EditViolationTypeDialog import EditViolationTypeDialog
+from libs import GlobalVariable
 
 
 class ViolationTypeTableWidget(QWidget):
@@ -87,11 +88,13 @@ class ViolationTypeTableWidget(QWidget):
         if selected:
             row = selected[0].row()
             vtype_id = int(self.table.item(row, 0).text())
-            confirm = QMessageBox.question(self, "Delete?", f"Delete Violation Type ID {vtype_id}?",
+            vtype = str(self.table.item(row, 1).text())
+            confirm = QMessageBox.question(self, "Delete?", f"Delete Violation Type {vtype}?",
                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if confirm == QMessageBox.StandardButton.Yes:
                 self.db.delete_violation_type(vtype_id)
                 self.load_types()
+                print(f"${GlobalVariable.user_login} Delete violation type {vtype}")
 
     def show_context_menu(self, pos):
         item = self.table.itemAt(pos)

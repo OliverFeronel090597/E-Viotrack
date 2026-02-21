@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
 try:
     from libs.DatabaseConnector import DatabaseConnector
     from libs.AutoCapital import AutoCapLineEdit
+    from libs import GlobalVariable
 except ImportError:
     from DatabaseConnector import DatabaseConnector
     from AutoCapital import AutoCapLineEdit
@@ -79,6 +80,10 @@ class EditUserDialog(QDialog):
         password = self.password_input.text().strip() or None
         confirm = self.confirm_password_input.text().strip() or None
         user_type = self.user_type_dropdown.currentText()
+        if self.is_edit_mode:
+            print(f"${GlobalVariable.user_login} Edit user {full_name} type {user_type}")
+        else:
+            print(f"${GlobalVariable.user_login} Added new user {full_name} type {user_type}")
 
         # --- Check required fields ---
         missing_fields = []
