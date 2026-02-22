@@ -21,7 +21,6 @@ The system reads RFID tag IDs from long-range RFID hardware and queries a databa
 
 - Python 3.10 or newer
 - PyQt6 6.7.0 or newer
-- pyserial 3.6 or newer (for serial communication with RFID reader)
 
 ## Installation
 
@@ -64,19 +63,45 @@ E-Viotrack/
 ├── README.md                  # This file
 ├── db/                        # SQLite database files
 ├── libs/                      # Core application modules
-├──
-   ├── Homepage.py            # Home page interface
-   ├── LogPage.py             # Activity logs display
-   ├── Adminpage.py           # Admin panel
-   ├── AdvancePage.py         # Advanced settings
-   ├── ReadSerial.py          # RFID serial communication
-   ├── DatabaseConnector.py   # SQLite database operations
-   ├── NotificationManager.py # User notifications
-   ├── CustomTable.py         # Custom table widget
-   ├── Animatedstack.py       # Animated page transitions
-   ├── GlobalVariable.py      # Global configuration
-   ├── Settings.py            # RFID manager settings
-   ├── Hasher.py              # Password hashing utilities
+│   ├── Homepage.py            # Home page interface
+│   ├── LogPage.py             # Activity logs display
+│   ├── Adminpage.py           # Admin panel
+│   ├── AdvancePage.py         # Advanced settings
+│   ├── ReadSerial.py          # RFID serial communication
+│   ├── DatabaseConnector.py   # SQLite database operations
+│   ├── NotificationManager.py # User notifications
+│   ├── CustomTable.py         # Custom table widget
+│   ├── Animatedstack.py       # Animated page transitions
+│   ├── GlobalVariable.py      # Global configuration
+│   ├── Settings.py            # RFID manager settings
+│   ├── Hasher.py              # Password hashing utilities
+│   ├── DriverTableWidget.py   # Driver table widget
+│   ├── EditDriverDialog.py    # Edit driver dialog
+│   ├── EditUserDialog.py      # Edit user dialog
+│   ├── EditViolationDialog.py # Edit violation dialog
+│   ├── EditViolationTypeDialog.py # Edit violation type dialog
+│   ├── Globalenentfilter.py   # Global event filter
+│   ├── RFIDWorker.py          # RFID worker thread
+│   ├── SerialReaderThread.py  # Serial reader thread
+│   ├── UserDriverEditView.py  # User/driver edit view
+│   ├── UserTableWidget.py     # User table widget
+│   ├── ViolationTableWidget.py # Violation table widget
+│   ├── ViolationTree.py       # Violation tree widget
+│   ├── ViolationTypeTableWidget.py # Violation type table widget
+│   ├── CompleterLineEdit.py   # Line edit with auto-complete
+│   ├── AutoCapital.py         # Auto-capitalization utility
+│   ├── AutoStyle.py           # Auto-style helper
+│   ├── AutoSuggestTextEdit.py # Auto-suggest text edit
+│   ├── Imagelabel.py          # Image label widget
+│   ├── Imagewididget.py       # Image widget
+│   ├── LineClickTextEdit.py   # Clickable text edit
+│   ├── LogsViewPage.py        # Logs view page
+│   ├── SlideNotification.py   # Slide notifications
+│   ├── stylesheetModefier.py  # Stylesheet modifier
+│   ├── TablePrint.py          # Table printing utility
+│   ├── TagListWidget.py       # Tag list widget
+│   ├── UniqueID.py            # Unique ID generator
+│   ├── resources.py           # Application resources (icons/images)
 ```
 
 ## Key Components
