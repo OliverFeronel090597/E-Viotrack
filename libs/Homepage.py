@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (
-    QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
+    QWidget, QHBoxLayout, QVBoxLayout,
     QTextEdit, QFrame, QTableWidget, QTableWidgetItem
 )
 from PyQt6.QtCore import Qt, QTimer
@@ -24,8 +24,26 @@ class HomePage(QWidget):
 
         # self.timer = QTimer()
         # self.timer.setInterval(5000)  # refresh every 5 seconds
-        # self.timer.timeout.connect(self.update_driver_data)
+        # self.timer.timeout.connect(self.sampling_data)
         # self.timer.start()
+    #     QTimer.singleShot(2000, self.sampling_data)
+
+    # def sampling_data(self):
+
+    #     lst = [
+    #         "250800795",
+    #         "250800799",
+    #         "250800803",
+    #         "250800815",
+    #         "250800819",
+    #         "250800823",
+    #         "273214197",
+    #         "250800827",
+    #         "3546166516",
+    #     ]
+    #     for rfid in lst:
+    #         self.handle_add_violation(rfid)
+    #         print(rfid)
 
     def init_top_row(self):
         top_row = QHBoxLayout()
@@ -72,59 +90,57 @@ class HomePage(QWidget):
         # print("[INFO] Delete button hidden from Homepage class as it may be used in the future")
         # self.violation_layout.addWidget(self.delete_btn)
 
-        self.violation_tree.driver_clicked.connect(self.on_driver_clicked)
+        #self.violation_tree.driver_clicked.connect(self.on_driver_clicked)
 
         # --- Replace QPlainTextEdit with QTableWidget ---
-        self.driver_table = QTableWidget()
-        self.driver_table.setObjectName("driver_table")
-        self.driver_table.setColumnCount(3)
-        self.driver_table.setHorizontalHeaderLabels(["Name", "Violation", "Date"])
-        self.driver_table.horizontalHeader().setStretchLastSection(True)
-        self.driver_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.driver_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.driver_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
-        self.violation_layout.addWidget(self.driver_table)
-
-
+        # self.driver_table = QTableWidget()
+        # self.driver_table.setObjectName("driver_table")
+        # self.driver_table.setColumnCount(3)
+        # self.driver_table.setHorizontalHeaderLabels(["Name", "Violation", "Date"])
+        # self.driver_table.horizontalHeader().setStretchLastSection(True)
+        # self.driver_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        # self.driver_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        # self.driver_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+        # self.violation_layout.addWidget(self.driver_table)
 
     def handle_add_violation(self, rfid=None):
         if not rfid:
             return
 
-        active_violations = self.db.get_active_violations_by_rfid(rfid)
+        active_violations = self.db.get_all_violations_by_rfid(rfid)  #self.db.get_active_violations_by_rfid(rfid) # they want to show all the violations when scan 
         if not active_violations:
             return
 
         for violation in active_violations:
             self.violation_tree.add_violation(violation, on_top=False)
 
-    def on_driver_clicked(self, driver_name: str):
-        violations = self.db.get_all_violation_driver(driver_name)
-        if not violations:
-            self.driver_table.setRowCount(0)
-            return
+    # def on_driver_clicked(self, driver_name: str):
+    #     violations = self.db.get_all_violation_driver(driver_name)
+    #     if not violations:
+    #         self.driver_table.setRowCount(0)
+    #         return
 
-        self.driver_table.setRowCount(len(violations))
+    #     self.driver_table.setRowCount(len(violations))
 
-        for row_idx, violation in enumerate(violations):
-            # Assuming idx 4 = Violation, idx 6 = Date
-            name_item = QTableWidgetItem(driver_name)
-            violation_item = QTableWidgetItem(str(violation[4]))
-            date_item = QTableWidgetItem(str(violation[6]))
+    #     for row_idx, violation in enumerate(violations):
+    #         # Assuming idx 4 = Violation, idx 6 = Date
+    #         name_item = QTableWidgetItem(driver_name)
+    #         violation_item = QTableWidgetItem(str(violation[4]))
+    #         date_item = QTableWidgetItem(str(violation[6]))
 
-            # Alignments
-            name_item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            violation_item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-            date_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+    #         # Alignments
+    #         name_item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+    #         violation_item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+    #         date_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            # Set items
-            self.driver_table.setItem(row_idx, 0, name_item)
-            self.driver_table.setItem(row_idx, 1, violation_item)
-            self.driver_table.setItem(row_idx, 2, date_item)
+    #         # Set items
+    #         self.driver_table.setItem(row_idx, 0, name_item)
+    #         self.driver_table.setItem(row_idx, 1, violation_item)
+    #         self.driver_table.setItem(row_idx, 2, date_item)
 
 
-        self.driver_table.resizeColumnsToContents()
-        self.driver_table.resizeRowsToContents()
+    #     self.driver_table.resizeColumnsToContents()
+    #     self.driver_table.resizeRowsToContents()
 
     def update_driver_data(self, driver_name: str = "Chris Wilson"):
         if not driver_name:

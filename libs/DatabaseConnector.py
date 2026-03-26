@@ -359,6 +359,27 @@ class DatabaseConnector:
                 "violation", "vehicle", "date", "due_date", "amount", "paid"]
         return [dict(zip(keys, row)) for row in rows]
 
+    def get_all_violations_by_rfid(self, rfid_serial: str) -> List[Dict[str, Any]]:
+        """
+        Fetch all active (unpaid) violations for a specific RFID.
+        Returns a list of dictionaries suitable for the ViolationTree.
+        """
+        query = """
+            SELECT d.full_name, d.driver_id, d.rfid_serial, 
+                v.violation, d.vehicle, v.date, v.due_date, v.amount, v.paid
+            FROM violations v
+            JOIN drivers d ON v.driver_id = d.driver_id
+            WHERE d.rfid_serial = ?
+            ORDER BY v.date DESC
+        """
+        rows = self.execute_query(query, (rfid_serial,), fetch_all=True)
+        if not rows:
+            return []
+
+        keys = ["driver_name", "driver_id", "rfid_serial",
+                "violation", "vehicle", "date", "due_date", "amount", "paid"]
+        return [dict(zip(keys, row)) for row in rows]
+
     def get_active_violations_by_username(self, username: str) -> list[dict]:
         """
         Fetch all active (unpaid) violations for a specific driver by username.
